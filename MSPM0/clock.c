@@ -23,9 +23,9 @@ void SysTick_Init(void)
 {
     DL_SYSTICK_config(CPUCLK_FREQ/1000);
     NVIC_SetPriority(SysTick_IRQn, 0);
-    
-    /* 硬件定时器TIMERA0中断配置 */
+
+    /* 纭欢瀹氭椂鍣═IMERA0涓柇閰嶇疆 */
     NVIC_ClearPendingIRQ(TIMER_0_INST_INT_IRQN);
-    NVIC_EnableIRQ(TIMER_0_INST_INT_IRQN);	
+    NVIC_EnableIRQ(TIMER_0_INST_INT_IRQN);
     DL_TimerA_startCounter(TIMER_0_INST);
 }

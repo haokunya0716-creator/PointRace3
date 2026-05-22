@@ -57,7 +57,7 @@ VL53L0X_Error VL53L0X_Init(void)
     status += VL53L0X_SetLimitCheckEnable(pDev, VL53L0X_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, 1);
 
     /* Ranging configuration */
-    switch(RangingConfig) 
+    switch(RangingConfig)
     {
         case LONG_RANGE:
             signalLimit = (FixPoint1616_t)(0.1*65536);

@@ -3,7 +3,7 @@
 
 void Motor_Init(void)
 {
-    //¿ªÆô´®¿Ú3µÄ½ÓÊÕÖĞ¶Ï
+    //å¼€å¯ä¸²å£3çš„æ¥æ”¶ä¸­æ–­
     NVIC_ClearPendingIRQ(MSPMotor_INST_INT_IRQN);
     NVIC_EnableIRQ(MSPMotor_INST_INT_IRQN);
 }
@@ -14,14 +14,14 @@ void Motor_Set_ClosedLoop(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // ä»ç«™åœ°å€
+    frame[idx++] = 0x06;        // åŠŸèƒ½ç ï¼šå†™å•ä¸ªä¿æŒå¯„å­˜å™¨
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x08;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
+    frame[idx++] = 0x00;        // èµ·å§‹å¯„å­˜å™¨é«˜å­—èŠ‚
+    frame[idx++] = 0x08;        // èµ·å§‹å¯„å­˜å™¨ä½å­—èŠ‚
 
-  
-    // ¼Ä´æÆ÷ 1
+
+    // å¯„å­˜å™¨ 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -29,7 +29,7 @@ void Motor_Set_ClosedLoop(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
+    // å‘é€
     for (uint8_t i = 0; i < idx; i++)
     {
         while (DL_UART_isBusy(MSPMotor_INST));
@@ -44,16 +44,16 @@ void Motor_Set_Speeds(int16_t v0, int16_t v1, int16_t v2, int16_t v3)
     uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x10;        // ¹¦ÄÜÂë£ºĞ´¶à¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // ä»ç«™åœ°å€
+    frame[idx++] = 0x10;        // åŠŸèƒ½ç ï¼šå†™å¤šä¸ªä¿æŒå¯„å­˜å™¨
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
+    frame[idx++] = 0x00;        // èµ·å§‹å¯„å­˜å™¨é«˜å­—èŠ‚
+    frame[idx++] = 0x00;        // èµ·å§‹å¯„å­˜å™¨ä½å­—èŠ‚
 
-    frame[idx++] = 0x00;        // ¼Ä´æÆ÷ÊıÁ¿¸ß×Ö½Ú
-    frame[idx++] = 0x04;        // ¼Ä´æÆ÷ÊıÁ¿µÍ×Ö½Ú£¨4 ¸ö£©
-	
-    frame[idx++] = 0x08;        // Êı¾İ×Ö½ÚÊı = 4 ¡Á 2 = 8
+    frame[idx++] = 0x00;        // å¯„å­˜å™¨æ•°é‡é«˜å­—èŠ‚
+    frame[idx++] = 0x04;        // å¯„å­˜å™¨æ•°é‡ä½å­—èŠ‚ï¼ˆ4 ä¸ªï¼‰
+
+    frame[idx++] = 0x08;        // æ•°æ®å­—èŠ‚æ•° = 4 Ã— 2 = 8
 
 
     frame[idx++] = (v0 >> 8) & 0xFF;
@@ -73,7 +73,7 @@ void Motor_Set_Speeds(int16_t v0, int16_t v1, int16_t v2, int16_t v3)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
+    // å‘é€
     for (uint8_t i = 0; i < idx; i++)
     {
         while (DL_UART_isBusy(MSPMotor_INST));
@@ -89,14 +89,14 @@ void Motor_Set_Enc1_A(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // ä»ç«™åœ°å€
+    frame[idx++] = 0x06;        // åŠŸèƒ½ç ï¼šå†™å•ä¸ªä¿æŒå¯„å­˜å™¨
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x09;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
+    frame[idx++] = 0x00;        // èµ·å§‹å¯„å­˜å™¨é«˜å­—èŠ‚
+    frame[idx++] = 0x09;        // èµ·å§‹å¯„å­˜å™¨ä½å­—èŠ‚
 
-  
-    // ¼Ä´æÆ÷ 1
+
+    // å¯„å­˜å™¨ 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -104,7 +104,7 @@ void Motor_Set_Enc1_A(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
+    // å‘é€
     for (uint8_t i = 0; i < idx; i++)
     {
         while (DL_UART_isBusy(MSPMotor_INST));
@@ -119,14 +119,14 @@ void Motor_Set_Enc1_B(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // ä»ç«™åœ°å€
+    frame[idx++] = 0x06;        // åŠŸèƒ½ç ï¼šå†™å•ä¸ªä¿æŒå¯„å­˜å™¨
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x0A;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
+    frame[idx++] = 0x00;        // èµ·å§‹å¯„å­˜å™¨é«˜å­—èŠ‚
+    frame[idx++] = 0x0A;        // èµ·å§‹å¯„å­˜å™¨ä½å­—èŠ‚
 
-  
-    // ¼Ä´æÆ÷ 1
+
+    // å¯„å­˜å™¨ 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -134,7 +134,7 @@ void Motor_Set_Enc1_B(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
+    // å‘é€
     for (uint8_t i = 0; i < idx; i++)
     {
         while (DL_UART_isBusy(MSPMotor_INST));
@@ -148,14 +148,14 @@ void Motor_Set_Enc1_C(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // ä»ç«™åœ°å€
+    frame[idx++] = 0x06;        // åŠŸèƒ½ç ï¼šå†™å•ä¸ªä¿æŒå¯„å­˜å™¨
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x0B;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
+    frame[idx++] = 0x00;        // èµ·å§‹å¯„å­˜å™¨é«˜å­—èŠ‚
+    frame[idx++] = 0x0B;        // èµ·å§‹å¯„å­˜å™¨ä½å­—èŠ‚
 
-  
-    // ¼Ä´æÆ÷ 1
+
+    // å¯„å­˜å™¨ 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -163,7 +163,7 @@ void Motor_Set_Enc1_C(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
+    // å‘é€
     for (uint8_t i = 0; i < idx; i++)
     {
         while (DL_UART_isBusy(MSPMotor_INST));
@@ -177,14 +177,14 @@ void Motor_Set_Enc1_D(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // ä»ç«™åœ°å€
+    frame[idx++] = 0x06;        // åŠŸèƒ½ç ï¼šå†™å•ä¸ªä¿æŒå¯„å­˜å™¨
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x0C;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
+    frame[idx++] = 0x00;        // èµ·å§‹å¯„å­˜å™¨é«˜å­—èŠ‚
+    frame[idx++] = 0x0C;        // èµ·å§‹å¯„å­˜å™¨ä½å­—èŠ‚
 
-  
-    // ¼Ä´æÆ÷ 1
+
+    // å¯„å­˜å™¨ 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -192,7 +192,7 @@ void Motor_Set_Enc1_D(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
+    // å‘é€
     for (uint8_t i = 0; i < idx; i++)
     {
         while (DL_UART_isBusy(MSPMotor_INST));
@@ -212,16 +212,16 @@ void Motor_Set_KP_KI_KD(PID_t *Motor1, PID_t *Motor2, PID_t *Motor3, PID_t *Moto
     uint8_t idx = 0;
 		uint8_t frame[34];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x10;        // ¹¦ÄÜÂë£ºĞ´¶à¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // ä»ç«™åœ°å€
+    frame[idx++] = 0x10;        // åŠŸèƒ½ç ï¼šå†™å¤šä¸ªä¿æŒå¯„å­˜å™¨
 
-    frame[idx++] = 0x00;  // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-		frame[idx++] = 0x15;  // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú (21)
-	
-    frame[idx++] = 0x00;        // ¼Ä´æÆ÷ÊıÁ¿¸ß×Ö½Ú
-    frame[idx++] = 0x0C;        // ¼Ä´æÆ÷ÊıÁ¿µÍ×Ö½Ú£¨12 ¸ö£©
-	
-    frame[idx++] = 0x18;   // Êı¾İ×Ö½ÚÊı = 12 ¡Á 2 = 24
+    frame[idx++] = 0x00;  // èµ·å§‹å¯„å­˜å™¨é«˜å­—èŠ‚
+		frame[idx++] = 0x15;  // èµ·å§‹å¯„å­˜å™¨ä½å­—èŠ‚ (21)
+
+    frame[idx++] = 0x00;        // å¯„å­˜å™¨æ•°é‡é«˜å­—èŠ‚
+    frame[idx++] = 0x0C;        // å¯„å­˜å™¨æ•°é‡ä½å­—èŠ‚ï¼ˆ12 ä¸ªï¼‰
+
+    frame[idx++] = 0x18;   // æ•°æ®å­—èŠ‚æ•° = 12 Ã— 2 = 24
 
 
 		Kp_Temp = (uint16_t)(Motor1->kp * 1000);
@@ -284,12 +284,12 @@ void Motor_Set_KP_KI_KD(PID_t *Motor1, PID_t *Motor2, PID_t *Motor3, PID_t *Moto
     frame[idx++] = (Kd_Temp >> 8) & 0xFF;
     frame[idx++] = (Kd_Temp >> 0) & 0xFF;
 
-   
+
     uint16_t crc = CRC16(frame, idx);
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
+    // å‘é€
     for (uint8_t i = 0; i < idx; i++)
     {
         while (DL_UART_isBusy(MSPMotor_INST));

@@ -22,7 +22,7 @@ void SysTick_Handler(void)
 extern volatile unsigned char uart_data;
 extern void Modbus_ParseFrame(uint8_t data);
 
-// 电机控制串口中断服务函数
+// 电机控制串口接收中断服务函数
 void MSPMotor_INST_IRQHandler(void)
 {
     switch( DL_UART_getPendingInterrupt(MSPMotor_INST) )
@@ -41,7 +41,7 @@ void IMU_INST_IRQHandler(void)
     switch( DL_UART_getPendingInterrupt(IMU_INST) )
     {
         case DL_UART_IIDX_RX: // 接收中断
-            // 直接读取数据并送入 board.c 的解析器
+            // 读取 IMU 串口数据并送入姿态解析器
             CopeSerial2Data(DL_UART_Main_receiveData(IMU_INST));
             break;
 
@@ -51,11 +51,11 @@ void IMU_INST_IRQHandler(void)
 }
 
 
-// Timer_0 1ms定时器中断服务函数 (若需保留)
+// TIMER_0 1ms 定时器中断服务函数，当前预留
 void TIMER_0_INST_IRQHandler(void)
-{	
+{
     switch( DL_TimerG_getPendingInterrupt(TIMER_0_INST) )
-    {     
+    {
         case DL_TIMER_IIDX_ZERO:
 
             break;
@@ -64,6 +64,9 @@ void TIMER_0_INST_IRQHandler(void)
     }
 }
 
+/*
+ * GPIO 组中断处理模板。当前 VL53L0X 已改为主循环轮询，暂时保留备用。
+ */
 /*
 void GROUP1_IRQHandler(void)
 {

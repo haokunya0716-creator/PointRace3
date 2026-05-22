@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright � 2015, STMicroelectronics International N.V.
+Copyright (c) 2015, STMicroelectronics International N.V.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ extern "C" {
  *
  * @brief All end user OS/platform/application porting
  */
- 
+
 /**
  * @defgroup VL53L0X_platform_group VL53L0X Platform Functions
  * @brief    VL53L0X Platform Functions
@@ -235,7 +235,7 @@ VL53L0X_Error VL53L0X_UpdateByte(VL53L0X_DEV Dev, uint8_t index, uint8_t AndData
 
 /** @} end of VL53L0X_registerAccess_group */
 
-    
+
 /**
  * @brief execute delay in all polling API call
  *
@@ -259,6 +259,3 @@ VL53L0X_Error VL53L0X_PollingDelay(VL53L0X_DEV Dev); /* usually best implemented
 #endif
 
 #endif  /* _VL53L0X_PLATFORM_H_ */
-
-
-

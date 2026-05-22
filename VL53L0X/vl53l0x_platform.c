@@ -1,4 +1,3 @@
-//?????#include "hal.h"
 #include "vl53l0x_platform.h"
 #include "vl53l0x_api.h"
 
@@ -142,7 +141,7 @@ int _I2CRead(VL53L0X_DEV Dev, uint8_t *pdata, uint32_t count)
                 ++i;
             }
         }
-        
+
         mspm0_get_clock_ms(&cur);
         if(cur >= (start + i2c_time_out))
         {

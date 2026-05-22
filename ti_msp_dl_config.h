@@ -82,7 +82,7 @@ extern "C" {
 #define PWM_0_INST                                                         TIMG6
 #define PWM_0_INST_IRQHandler                                   TIMG6_IRQHandler
 #define PWM_0_INST_INT_IRQN                                     (TIMG6_INT_IRQn)
-#define PWM_0_INST_CLK_FREQ                                             80000000
+#define PWM_0_INST_CLK_FREQ                                               500000
 /* GPIO defines for channel 0 */
 #define GPIO_PWM_0_C0_PORT                                                 GPIOB
 #define GPIO_PWM_0_C0_PIN                                          DL_GPIO_PIN_6

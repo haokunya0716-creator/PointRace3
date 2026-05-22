@@ -42,14 +42,14 @@ static char auchCRCLo[256] = {
 0x40
 };
 
-unsigned short CRC16(uint8_t *puchMsg, unsigned short usDataLen) //ÓÃÓÚ¼ÆËã CRC
+unsigned short CRC16(uint8_t *puchMsg, unsigned short usDataLen) //ç”¨äºè®¡ç®— CRC
 {
-		unsigned char uchCRCHi = 0xFF; /* CRC µÄ¸ß×Ö½Ú³õÊ¼»¯*/
-		unsigned char uchCRCLo = 0xFF; /* CRC µÄµÍ×Ö½Ú³õÊ¼»¯*/
-		unsigned uIndex ; /* CRC ²éÑ¯±íË÷Òı*/
-		while (usDataLen--) /* Íê³ÉÕû¸öÊı×é»º³åÇø*/
+		unsigned char uchCRCHi = 0xFF; /* CRC çš„é«˜å­—èŠ‚åˆå§‹åŒ–*/
+		unsigned char uchCRCLo = 0xFF; /* CRC çš„ä½å­—èŠ‚åˆå§‹åŒ–*/
+		unsigned uIndex ; /* CRC æŸ¥è¯¢è¡¨ç´¢å¼•*/
+		while (usDataLen--) /* å®Œæˆæ•´ä¸ªæ•°ç»„ç¼“å†²åŒº*/
 		{
-				uIndex = uchCRCLo ^ *puchMsg++; /* ¼ÆËã CRC */
+				uIndex = uchCRCLo ^ *puchMsg++; /* è®¡ç®— CRC */
 				uchCRCLo = uchCRCHi ^ auchCRCHi[uIndex];
 				uchCRCHi = auchCRCLo[uIndex];
 		}

@@ -3,7 +3,7 @@
 
 #include "ti_msp_dl_config.h"
 
-unsigned short CRC16(uint8_t *puchMsg, unsigned short usDataLen); //ÓÃÓÚ¼ÆËã CRC
+unsigned short CRC16(uint8_t *puchMsg, unsigned short usDataLen); //ç”¨äºè®¡ç®— CRC
 
 
 #endif
