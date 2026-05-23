@@ -5,7 +5,9 @@
 #include "clock.h"   // 包含 mspm0_delay_ms 和 SysTick_Init
 #include "task.h"    // 包含基于 SysTick 的任务调度宏
 #include "imu.h"
-#include "vl53l0x.h"
+#include "app_vl5310x.h"
+#include "app_linedetect.h"
+#include "app_PWM.h"
 
 volatile unsigned char uart_data = 0;
 
@@ -29,11 +31,15 @@ int main(void)
     // 初始化陀螺仪（打开中断并校准），要静止30s左右
     IMU_Init();
 
-    // 初始化 VL53L0X，后续在主循环里轮询读取
-    VL53L0X_Init();
+    // 初始化三路 VL53L0X，后续在主循环里轮询读取
+    App_VL5310X_Init();
+
+    // 初始化四路 180 度舵机 PWM，默认全部置中到 90 度
+    App_PWM_Init();
 
     // 初始化电机驱动板的串口（打开中断）
     Motor_Init();
+    App_LineDetect_Init();
 
     /* 2. 初始化阶段的阻塞延时：使用基于 SysTick 的 mspm0_delay_ms */
     Motor_Set_ClosedLoop();
@@ -49,7 +55,6 @@ int main(void)
     M4_PID.ki = 4.9;
 
     while (1) {
-
         /* 3. 任务一：电机控制非阻塞任务，基于 SysTick (tick_ms)
          * 每 10ms 调度一次，PID和速度交替发送 */
         PERIODIC_START(task_motor, 10)
@@ -63,13 +68,17 @@ int main(void)
             }
         PERIODIC_END
 
-        /* VL53L0X 轮询任务：有新测距结果时会更新 VL53L0X_Distance_mm */
-        PERIODIC_START(task_vl53l0x, 50)
-            VL53L0X_Poll();
+        /* 灰度黑线检测任务：只更新黑线/边界状态，不做循迹控制 */
+        PERIODIC_START(task_line_detect, 20)
+            App_LineDetect_Proc();
         PERIODIC_END
 
-        /* 串口打印非阻塞，基于 SysTick (tick_ms)*/
+        /* VL53L0X 轮询任务：更新 VL5310X_Distance_mm[VL5310X_FRONT/LEFT/RIGHT] */
+        PERIODIC_START(task_vl53l0x, 50)
+            App_VL5310X_Proc();
+        PERIODIC_END
 
+        /* 串口打印非阻塞，基于 SysTick (tick_ms) */
         PERIODIC_START(task_print, 200)
             printf("%d,%d,%d,%d,%d,%d,%d,%d\n",
                    modbus_date[0], modbus_date[1], modbus_date[2], modbus_date[3],

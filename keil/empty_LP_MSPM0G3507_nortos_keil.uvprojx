@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\..\PointRace3;..\source\third_party\CMSIS\Core\Include;..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\..\PointRace3;..\source\ti\driverlib;..\..\..\mspm0_sdk_2_02_00_05;..\..\PointRace3;..\MSPM0;..\VL53L0X</IncludePath>
+              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\third_party\CMSIS\Core\Include;..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\ti\driverlib;..\..\..\mspm0_sdk_2_02_00_05;..\..\PointRace3;..\MSPM0;..\VL53L0X;..\Application;..\LCD;..\Board;..\LCD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -512,6 +512,41 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Application</GroupName>
+          <Files>
+            <File>
+              <FileName>app_vl5310x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\app_vl5310x.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_vl5310x.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\app_vl5310x.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_linedetect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\app_linedetect.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_linedetect.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\app_linedetect.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_PWM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\app_PWM.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_PWM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\app_PWM.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>VL53L0X</GroupName>
           <Files>
             <File>
@@ -618,6 +653,56 @@
               <FileName>vl53l0x_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\VL53L0X\vl53l0x_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcdfont.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\LCD\lcdfont.h</FilePath>
+            </File>
+            <File>
+              <FileName>pic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\LCD\pic.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Board</GroupName>
+          <Files>
+            <File>
+              <FileName>board.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Board\board.c</FilePath>
+            </File>
+            <File>
+              <FileName>board.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Board\board.h</FilePath>
             </File>
           </Files>
         </Group>
