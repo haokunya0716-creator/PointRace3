@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\third_party\CMSIS\Core\Include;..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\ti\driverlib;..\..\..\mspm0_sdk_2_02_00_05;..\..\PointRace3;..\MSPM0;..\VL53L0X;..\Application;..\LCD;..\Board;..\LCD</IncludePath>
+              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\third_party\CMSIS\Core\Include;..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\ti\driverlib;..\..\..\mspm0_sdk_2_02_00_05;..\..\PointRace3;..\MSPM0;..\VL53L0X;..\Application;..\LCD;..\Board;..\LCD;..\PID</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -544,6 +544,16 @@
               <FileType>5</FileType>
               <FilePath>..\Application\app_PWM.h</FilePath>
             </File>
+            <File>
+              <FileName>app_motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app_motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\app_motor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -703,6 +713,21 @@
               <FileName>board.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Board\board.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>PID</GroupName>
+          <Files>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PID\pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\PID\pid.h</FilePath>
             </File>
           </Files>
         </Group>

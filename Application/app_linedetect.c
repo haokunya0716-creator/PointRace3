@@ -41,25 +41,6 @@ static uint8_t ReadOut(void)
 }
 
 /**
- * @brief 初始化八路灰度传感器 GPIO。
- * @param 无
- * @return 无
- */
-void App_LineDetect_Init(void)
-{
-    DL_GPIO_initDigitalOutput(LINE_FOLLOW_AD0_X1_IOMUX);
-    DL_GPIO_initDigitalOutput(LINE_FOLLOW_AD1_X2_IOMUX);
-    DL_GPIO_initDigitalOutput(LINE_FOLLOW_AD2_X3_IOMUX);
-    DL_GPIO_initDigitalInput(LINE_FOLLOW_OUT_X4_IOMUX);
-
-    DL_GPIO_clearPins(LINE_FOLLOW_PORT,
-        LINE_FOLLOW_AD0_X1_PIN | LINE_FOLLOW_AD1_X2_PIN | LINE_FOLLOW_AD2_X3_PIN);
-
-    DL_GPIO_enableOutput(LINE_FOLLOW_PORT,
-        LINE_FOLLOW_AD0_X1_PIN | LINE_FOLLOW_AD1_X2_PIN | LINE_FOLLOW_AD2_X3_PIN);
-}
-
-/**
  * @brief 扫描八路灰度传感器，并更新黑线检测状态。
  * @param 无
  * @return 无

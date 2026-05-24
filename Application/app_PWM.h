@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include "ti_msp_dl_config.h"
 
-#define APP_PWM_SERVO_MIN_US   500U    // 0 度对应的高电平时间，单位 us
-#define APP_PWM_SERVO_MAX_US   2500U   // 180 度对应的高电平时间，单位 us
+#define APP_PWM_SERVO_MIN_US   500    // 0 度对应的高电平时间，单位 us
+#define APP_PWM_SERVO_MAX_US   2500   // 180 度对应的高电平时间，单位 us
 #define APP_PWM_SERVO_MAX_DEG  180.0f  // 180 度舵机的最大角度
-#define APP_PWM_TICK_US        2U      // SysConfig 中 PWM 计数频率为 500kHz，所以 1 个计数 = 2us
+#define APP_PWM_TICK_US        2      // SysConfig 中 PWM 计数频率为 500kHz，所以 1 个计数 = 2us
 
 /**
  * @brief 舵机 PWM 输出通道编号。

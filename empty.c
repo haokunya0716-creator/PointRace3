@@ -8,11 +8,10 @@
 #include "app_vl5310x.h"
 #include "app_linedetect.h"
 #include "app_PWM.h"
+#include "keil/app_motor.h"
 
 volatile unsigned char uart_data = 0;
 
-extern volatile int16_t modbus_date[8];
-extern volatile uint8_t modbus_rx_frame_done;
 int16_t MA_Speed, MB_Speed, MC_Speed, MD_Speed;
 
 
@@ -36,10 +35,12 @@ int main(void)
 
     // 初始化四路 180 度舵机 PWM，默认全部置中到 90 度
     App_PWM_Init();
+	 //灰度传感器的初始化就是引脚初始化，sysconfig里已经写好，ti会自动配置
+	 //App_Linedetect_Init();  写个假的，看起来顺眼
+    App_Motor_Init();
 
     // 初始化电机驱动板的串口（打开中断）
     Motor_Init();
-    App_LineDetect_Init();
 
     /* 2. 初始化阶段的阻塞延时：使用基于 SysTick 的 mspm0_delay_ms */
     Motor_Set_ClosedLoop();
@@ -59,6 +60,10 @@ int main(void)
          * 每 10ms 调度一次，PID和速度交替发送 */
         PERIODIC_START(task_motor, 10)
             static uint8_t motor_step = 0;
+
+            App_Motor_Position_Proc();
+            App_Motor_Angle_Proc();
+
             if (motor_step == 0) {
                 Motor_Set_KP_KI_KD(&M1_PID, &M2_PID, &M3_PID, &M4_PID);
                 motor_step = 1;

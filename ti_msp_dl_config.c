@@ -91,7 +91,6 @@ SYSCONFIG_WEAK bool SYSCFG_DL_saveConfiguration(void)
     return retStatus;
 }
 
-
 SYSCONFIG_WEAK bool SYSCFG_DL_restoreConfiguration(void)
 {
     bool retStatus = true;
@@ -250,7 +249,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_SYSCTL_init(void)
     DL_SYSCTL_setBORThreshold(DL_SYSCTL_BOR_THRESHOLD_LEVEL_0);
     DL_SYSCTL_setFlashWaitState(DL_SYSCTL_FLASH_WAIT_STATE_2);
 
-
 	DL_SYSCTL_setSYSOSCFreq(DL_SYSCTL_SYSOSC_FREQ_BASE);
 	/* Set default configuration */
 	DL_SYSCTL_disableHFXT();
@@ -306,7 +304,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_PWM_0_init(void) {
     DL_TimerG_enableClock(PWM_0_INST);
 
 
-
     DL_TimerG_setCCPDirection(PWM_0_INST , DL_TIMER_CC0_OUTPUT | DL_TIMER_CC1_OUTPUT );
 
 
@@ -354,12 +351,10 @@ SYSCONFIG_WEAK void SYSCFG_DL_SERVO_1_init(void) {
     DL_TimerA_enableClock(SERVO_1_INST);
 
 
-
     DL_TimerA_setCCPDirection(SERVO_1_INST , DL_TIMER_CC0_OUTPUT | DL_TIMER_CC1_OUTPUT );
 
 
 }
-
 
 
 /*

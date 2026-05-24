@@ -1,11 +1,6 @@
 #include "motor_Read_enc.h"
 
 
-volatile int16_t	modbus_date[8];		//存储累计编码器值
-volatile uint8_t modbus_rx_frame_done;   // 编码器读取完成标志位
-
-
-
 volatile int16_t modbus_date[8];       // 存储接收到的寄存器数据
 volatile uint8_t modbus_rx_frame_done; // 接收完成标志
 
