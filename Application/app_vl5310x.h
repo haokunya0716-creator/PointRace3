@@ -5,25 +5,22 @@
 #include "ti_msp_dl_config.h"
 #include "vl53l0x.h"
 
-#define VL5310X_FRONT_OBSTACLE_MM  250U // 前方避障阈值，单位 mm
-#define VL5310X_SIDE_OBSTACLE_MM   180U // 左右避障阈值，单位 mm
+#define VL5310X_FRONT_OBSTACLE_MM  250 // 前方避障阈值，单位 mm
+#define VL5310X_SIDE_OBSTACLE_MM   180 // 左右避障阈值，单位 mm
 
 /**
  * @brief 三个 VL53L0X 的逻辑编号。
- * @note VL5310X_COUNT 是传感器数量，用来定义数组长度。
+ * @note VL5310X_COUNT 是传感器数量，用来定义数组长度，非常置方便且简洁。
  */
 typedef enum {
     VL5310X_FRONT = 0, // 前方传感器，物理引脚为 XSHUT2
-    VL5310X_LEFT,      // 左侧传感器，物理引脚为 XSHUT1
-    VL5310X_RIGHT,     // 右侧传感器，物理引脚为 XSHUT3
-    VL5310X_COUNT      // 传感器数量：前、左、右，一共 3 个
-} VL5310X_SensorId_t;
+    VL5310X_LEFT = 1,      // 左侧传感器，物理引脚为 XSHUT1
+    VL5310X_RIGHT = 2,     // 右侧传感器，物理引脚为 XSHUT3
+    VL5310X_COUNT = 3,   // 传感器数量：前、左、右，一共 3 个
+	} VL5310X_SensorId_t; //激光测距的枚举（前，左，右分别对应0，1，2。传感器总数为3）
 
 extern volatile uint16_t VL5310X_Distance_mm[VL5310X_COUNT]; // 三路最新距离，单位 mm
-extern volatile uint8_t VL5310X_RangeStatus[VL5310X_COUNT];  // 三路测距质量，0 表示有效
-extern volatile uint8_t VL5310X_DataReady[VL5310X_COUNT];    // 三路是否已经读到过距离
-extern volatile uint8_t VL5310X_Online[VL5310X_COUNT];       // 三路是否初始化成功
-extern volatile VL53L0X_Error VL5310X_LastError[VL5310X_COUNT]; // 三路最近一次 API/I2C 状态
+
 
 extern volatile uint8_t vl5310x_front_obstacle_flag; // 前方障碍标志，1 表示距离小于 VL5310X_FRONT_OBSTACLE_MM
 extern volatile uint8_t vl5310x_left_obstacle_flag;  // 左侧障碍标志，1 表示距离小于 VL5310X_SIDE_OBSTACLE_MM

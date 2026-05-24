@@ -119,7 +119,7 @@ void App_VL5310X_Init(void)
 
     for (uint8_t i = 0; i < VL5310X_COUNT; i++)
     {
-        XshutWrite((VL5310X_SensorId_t)i, 1);
+			XshutWrite((VL5310X_SensorId_t)i, 1);//先单独把这一路拉高，改地址（改地址时，这个I2C上只能由一路地址为0x29的有效外设，否则改不了）
         mspm0_delay_ms(5);
 
         VL5310X_LastError[i] = VL53L0X_InitDevice(&dev[i], addr[i]);
@@ -138,8 +138,12 @@ void App_VL5310X_Proc(void)
 {
     for (uint8_t i = 0; i < VL5310X_COUNT; i++)
     {
+			//如果已经初始化成功的话,这个数组对应的值会是1.
+			//如果未初始化成功的话就会直接跳过这个传感器对应的循环
         if (!VL5310X_Online[i])
+				{
             continue;
+				}
 
         if (VL53L0X_PollDevice(&dev[i], &meas[i]))
         {

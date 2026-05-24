@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include "ti_msp_dl_config.h"
 
-#define LINE_SENSOR_NUM           8U // 八路灰度传感器通道数量，X1~X8
-#define LINE_SENSOR_ACTIVE_LEVEL  1U // 黑线有效电平；实测如果黑线读到 0，就把这里改成 0
+#define LINE_SENSOR_NUM           8 // 八路灰度传感器通道数量，X1~X8
+#define LINE_SENSOR_ACTIVE_LEVEL  1 // 黑线有效电平；实测如果黑线读到 0，就把这里改成 0
 
 extern volatile uint8_t line_raw[LINE_SENSOR_NUM]; // X1~X8 原始读数，每个元素为 0 或 1
 extern volatile uint8_t line_black_flag;           // 1：至少一路检测到黑线；0：没有检测到黑线
