@@ -35,14 +35,14 @@ void MSPMotor_INST_IRQHandler(void)
             break;
     }
 }
-
+extern volatile unsigned char imu_data;
 void IMU_INST_IRQHandler(void)
 {
     switch( DL_UART_getPendingInterrupt(IMU_INST) )
     {
         case DL_UART_IIDX_RX: // 接收中断
             // 读取 IMU 串口数据并送入姿态解析器
-            CopeSerial2Data(DL_UART_Main_receiveData(IMU_INST));
+            CopeSerial2Data( DL_UART_Main_receiveData(IMU_INST));
             break;
 
         default:

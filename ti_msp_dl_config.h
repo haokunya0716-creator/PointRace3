@@ -129,6 +129,7 @@ extern "C" {
 #define I2C_VL53L0X_INST                                                    I2C0
 #define I2C_VL53L0X_INST_IRQHandler                              I2C0_IRQHandler
 #define I2C_VL53L0X_INST_INT_IRQN                                  I2C0_INT_IRQn
+#define I2C_VL53L0X_BUS_SPEED_HZ                                          100000
 #define GPIO_I2C_VL53L0X_SDA_PORT                                          GPIOA
 #define GPIO_I2C_VL53L0X_SDA_PIN                                   DL_GPIO_PIN_0
 #define GPIO_I2C_VL53L0X_IOMUX_SDA                                (IOMUX_PINCM1)
@@ -139,22 +140,6 @@ extern "C" {
 #define GPIO_I2C_VL53L0X_IOMUX_SCL_FUNC                 IOMUX_PINCM2_PF_I2C0_SCL
 
 
-/* Defines for user */
-#define user_INST                                                          UART0
-#define user_INST_FREQUENCY                                              4000000
-#define user_INST_IRQHandler                                    UART0_IRQHandler
-#define user_INST_INT_IRQN                                        UART0_INT_IRQn
-#define GPIO_user_RX_PORT                                                  GPIOA
-#define GPIO_user_TX_PORT                                                  GPIOA
-#define GPIO_user_RX_PIN                                          DL_GPIO_PIN_11
-#define GPIO_user_TX_PIN                                          DL_GPIO_PIN_10
-#define GPIO_user_IOMUX_RX                                       (IOMUX_PINCM22)
-#define GPIO_user_IOMUX_TX                                       (IOMUX_PINCM21)
-#define GPIO_user_IOMUX_RX_FUNC                        IOMUX_PINCM22_PF_UART0_RX
-#define GPIO_user_IOMUX_TX_FUNC                        IOMUX_PINCM21_PF_UART0_TX
-#define user_BAUD_RATE                                                  (115200)
-#define user_IBRD_4_MHZ_115200_BAUD                                          (2)
-#define user_FBRD_4_MHZ_115200_BAUD                                         (11)
 /* Defines for MSPMotor */
 #define MSPMotor_INST                                                      UART3
 #define MSPMotor_INST_FREQUENCY                                          4000000
@@ -203,6 +188,22 @@ extern "C" {
 #define Vision_BAUD_RATE                                                (115200)
 #define Vision_IBRD_40_MHZ_115200_BAUD                                      (21)
 #define Vision_FBRD_40_MHZ_115200_BAUD                                      (45)
+/* Defines for user */
+#define user_INST                                                          UART0
+#define user_INST_FREQUENCY                                              4000000
+#define user_INST_IRQHandler                                    UART0_IRQHandler
+#define user_INST_INT_IRQN                                        UART0_INT_IRQn
+#define GPIO_user_RX_PORT                                                  GPIOA
+#define GPIO_user_TX_PORT                                                  GPIOA
+#define GPIO_user_RX_PIN                                          DL_GPIO_PIN_11
+#define GPIO_user_TX_PIN                                          DL_GPIO_PIN_10
+#define GPIO_user_IOMUX_RX                                       (IOMUX_PINCM22)
+#define GPIO_user_IOMUX_TX                                       (IOMUX_PINCM21)
+#define GPIO_user_IOMUX_RX_FUNC                        IOMUX_PINCM22_PF_UART0_RX
+#define GPIO_user_IOMUX_TX_FUNC                        IOMUX_PINCM21_PF_UART0_TX
+#define user_BAUD_RATE                                                  (115200)
+#define user_IBRD_4_MHZ_115200_BAUD                                          (2)
+#define user_FBRD_4_MHZ_115200_BAUD                                         (11)
 
 
 
@@ -227,6 +228,24 @@ extern "C" {
 
 
 
+/* Defines for ADC_BAT */
+#define ADC_BAT_INST                                                        ADC1
+#define ADC_BAT_INST_IRQHandler                                  ADC1_IRQHandler
+#define ADC_BAT_INST_INT_IRQN                                    (ADC1_INT_IRQn)
+#define ADC_BAT_ADCMEM_0                                      DL_ADC12_MEM_IDX_0
+#define ADC_BAT_ADCMEM_0_REF                     DL_ADC12_REFERENCE_VOLTAGE_VDDA
+#define ADC_BAT_ADCMEM_0_REF_VOLTAGE_V                                       3.3
+#define GPIO_ADC_BAT_C0_PORT                                               GPIOA
+#define GPIO_ADC_BAT_C0_PIN                                       DL_GPIO_PIN_15
+
+
+
+/* Port definition for Pin Group LED */
+#define LED_PORT                                                         (GPIOB)
+
+/* Defines for LED_0: GPIOB.22 with pinCMx 50 on package pin 21 */
+#define LED_LED_0_PIN                                           (DL_GPIO_PIN_22)
+#define LED_LED_0_IOMUX                                          (IOMUX_PINCM50)
 /* Defines for XSHUT1: GPIOA.31 with pinCMx 6 on package pin 39 */
 #define XSHUT_XSHUT1_PORT                                                (GPIOA)
 #define XSHUT_XSHUT1_PIN                                        (DL_GPIO_PIN_31)
@@ -269,6 +288,18 @@ extern "C" {
 /* Defines for BLK: GPIOB.26 with pinCMx 57 on package pin 28 */
 #define LCD_BLK_PIN                                             (DL_GPIO_PIN_26)
 #define LCD_BLK_IOMUX                                            (IOMUX_PINCM57)
+/* Port definition for Pin Group KEY */
+#define KEY_PORT                                                         (GPIOA)
+
+/* Defines for KEY2: GPIOA.8 with pinCMx 19 on package pin 54 */
+#define KEY_KEY2_PIN                                             (DL_GPIO_PIN_8)
+#define KEY_KEY2_IOMUX                                           (IOMUX_PINCM19)
+/* Defines for KEY1: GPIOA.28 with pinCMx 3 on package pin 35 */
+#define KEY_KEY1_PIN                                            (DL_GPIO_PIN_28)
+#define KEY_KEY1_IOMUX                                            (IOMUX_PINCM3)
+/* Defines for KEY3: GPIOA.9 with pinCMx 20 on package pin 55 */
+#define KEY_KEY3_PIN                                             (DL_GPIO_PIN_9)
+#define KEY_KEY3_IOMUX                                           (IOMUX_PINCM20)
 
 
 
@@ -282,11 +313,12 @@ void SYSCFG_DL_PWM_0_init(void);
 void SYSCFG_DL_SERVO_1_init(void);
 void SYSCFG_DL_TIMER_0_init(void);
 void SYSCFG_DL_I2C_VL53L0X_init(void);
-void SYSCFG_DL_user_init(void);
 void SYSCFG_DL_MSPMotor_init(void);
 void SYSCFG_DL_IMU_init(void);
 void SYSCFG_DL_Vision_init(void);
+void SYSCFG_DL_user_init(void);
 void SYSCFG_DL_SPI_LCD_init(void);
+void SYSCFG_DL_ADC_BAT_init(void);
 
 void SYSCFG_DL_SYSTICK_init(void);
 

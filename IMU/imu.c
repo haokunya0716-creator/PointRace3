@@ -4,7 +4,7 @@
 
 struct SAngle stcAngle;
 struct SGyro stcGyro;
-
+volatile unsigned char imu_data;
 void IMU_Init(void)
 {
     NVIC_ClearPendingIRQ(IMU_INST_INT_IRQN);
@@ -31,70 +31,56 @@ void IMU_send_bytes(uint8_t* data, uint32_t len)
 }
 
 /******************************************************************************
- * 状态机解析：强抗干扰，防丢包错位
- ******************************************************************************/
+ * 数据解析函数：接收0x5A开头的5字节数据帧
+******************************************************************************/
 void CopeSerial2Data(unsigned char ucData)
 {
-    static unsigned char ucRxBuffer[5];
-    static uint8_t state = 0; // 状态变量
+    static unsigned char ucRxBuffer[11];
+    static unsigned char ucRxCnt = 0;
 
-    switch (state)
+    ucRxBuffer[ucRxCnt++] = ucData;
+
+    if (ucRxBuffer[0] != 0x5A)
     {
-        case 0: // 等待帧头 0x5A
-            if (ucData == 0x5A)
-            {
-                ucRxBuffer[0] = ucData;
-                state = 1;
-            }
-            break;
-
-        case 1: // 等待数据类型 0xAA (角速度) 或 0xBB (角度)
-            if (ucData == 0xAA || ucData == 0xBB)
-            {
-                ucRxBuffer[1] = ucData;
-                state = 2;
-            }
-            else
-            {
-                state = 0; // 类型不对，退回重新寻找帧头
-            }
-            break;
-
-        case 2: // 接收数据低字节 DATAL
-            ucRxBuffer[2] = ucData;
-            state = 3;
-            break;
-
-        case 3: // 接收数据高字节 DATAH
-            ucRxBuffer[3] = ucData;
-            state = 4;
-            break;
-
-        case 4: // 接收校验和 SUM 并验证
-            ucRxBuffer[4] = ucData;
-
-            // 计算校验和
-            unsigned char sum = ucRxBuffer[0] + ucRxBuffer[1] + ucRxBuffer[2] + ucRxBuffer[3];
-            if (sum == ucRxBuffer[4]) // 校验通过
-            {
-                if (ucRxBuffer[1] == 0xAA) // Z轴角速度
-                {
-                    short wz = (short)((ucRxBuffer[3] << 8) | ucRxBuffer[2]);
-                    stcGyro.wz = (float)wz / 32768.0f * 2000.0f;
-                }
-                else if (ucRxBuffer[1] == 0xBB) // Yaw航向角
-                {
-                    short rawYaw = (short)((ucRxBuffer[3] << 8) | ucRxBuffer[2]);
-                    stcAngle.Yaw = (float)rawYaw / 32768.0f * 180.0f;
-                }
-            }
-            state = 0; // 无论校验是否通过，重置状态准备接收下一帧
-            break;
-
-        default:
-            state = 0;
-            break;
+        ucRxCnt = 0;
+        return;
     }
+
+    if (ucRxCnt < 5) return;
+
+    unsigned char sum = 0;
+    if (ucRxBuffer[1] == 0xAA)
+    {
+        // 角速度帧校验和：0x5A + 0xAA + AzL + AzH 
+        sum = ucRxBuffer[0] + ucRxBuffer[1] +
+              ucRxBuffer[2] + ucRxBuffer[3] ;
+
+        if (sum != ucRxBuffer[4])
+        {
+            ucRxCnt = 0;
+            return;
+        }
+
+        short wz    = (short)((ucRxBuffer[3] << 8) | ucRxBuffer[2]);
+
+        stcGyro.wz    = (float)wz    / 32768.0f * 2000.0f;
+    }
+    else if (ucRxBuffer[1] == 0xBB)
+    {
+        // 角度帧校验和：0x5A + 0xBB + YawH + YawL 
+        sum = ucRxBuffer[0] + ucRxBuffer[1] +
+              ucRxBuffer[2] + ucRxBuffer[3];
+
+        if (sum != ucRxBuffer[4])
+        {
+            ucRxCnt = 0;
+            return;
+        }
+
+        short rawYaw = (short)((ucRxBuffer[3] << 8) | ucRxBuffer[2]);
+        stcAngle.Yaw = (float)rawYaw / 32768.0f * 180.0f;
+    }
+    ucRxCnt = 0;
 }
 // 获取yaw轴角度
 float getYaw(void)

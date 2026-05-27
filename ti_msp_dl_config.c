@@ -60,11 +60,12 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_SERVO_1_init();
     SYSCFG_DL_TIMER_0_init();
     SYSCFG_DL_I2C_VL53L0X_init();
-    SYSCFG_DL_user_init();
     SYSCFG_DL_MSPMotor_init();
     SYSCFG_DL_IMU_init();
     SYSCFG_DL_Vision_init();
+    SYSCFG_DL_user_init();
     SYSCFG_DL_SPI_LCD_init();
+    SYSCFG_DL_ADC_BAT_init();
     SYSCFG_DL_SYSTICK_init();
     /* Ensure backup structures have no valid state */
 	gPWM_0Backup.backupRdy 	= false;
@@ -91,6 +92,7 @@ SYSCONFIG_WEAK bool SYSCFG_DL_saveConfiguration(void)
     return retStatus;
 }
 
+
 SYSCONFIG_WEAK bool SYSCFG_DL_restoreConfiguration(void)
 {
     bool retStatus = true;
@@ -112,11 +114,12 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_TimerA_reset(SERVO_1_INST);
     DL_TimerA_reset(TIMER_0_INST);
     DL_I2C_reset(I2C_VL53L0X_INST);
-    DL_UART_Main_reset(user_INST);
     DL_UART_Main_reset(MSPMotor_INST);
     DL_UART_Main_reset(IMU_INST);
     DL_UART_Main_reset(Vision_INST);
+    DL_UART_Main_reset(user_INST);
     DL_SPI_reset(SPI_LCD_INST);
+    DL_ADC12_reset(ADC_BAT_INST);
 
 
     DL_GPIO_enablePower(GPIOA);
@@ -125,11 +128,12 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_TimerA_enablePower(SERVO_1_INST);
     DL_TimerA_enablePower(TIMER_0_INST);
     DL_I2C_enablePower(I2C_VL53L0X_INST);
-    DL_UART_Main_enablePower(user_INST);
     DL_UART_Main_enablePower(MSPMotor_INST);
     DL_UART_Main_enablePower(IMU_INST);
     DL_UART_Main_enablePower(Vision_INST);
+    DL_UART_Main_enablePower(user_INST);
     DL_SPI_enablePower(SPI_LCD_INST);
+    DL_ADC12_enablePower(ADC_BAT_INST);
 
     delay_cycles(POWER_STARTUP_DELAY);
 }
@@ -158,10 +162,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
     DL_GPIO_enableHiZ(GPIO_I2C_VL53L0X_IOMUX_SCL);
 
     DL_GPIO_initPeripheralOutputFunction(
-        GPIO_user_IOMUX_TX, GPIO_user_IOMUX_TX_FUNC);
-    DL_GPIO_initPeripheralInputFunction(
-        GPIO_user_IOMUX_RX, GPIO_user_IOMUX_RX_FUNC);
-    DL_GPIO_initPeripheralOutputFunction(
         GPIO_MSPMotor_IOMUX_TX, GPIO_MSPMotor_IOMUX_TX_FUNC);
     DL_GPIO_initPeripheralInputFunction(
         GPIO_MSPMotor_IOMUX_RX, GPIO_MSPMotor_IOMUX_RX_FUNC);
@@ -173,6 +173,10 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
         GPIO_Vision_IOMUX_TX, GPIO_Vision_IOMUX_TX_FUNC);
     DL_GPIO_initPeripheralInputFunction(
         GPIO_Vision_IOMUX_RX, GPIO_Vision_IOMUX_RX_FUNC);
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_user_IOMUX_TX, GPIO_user_IOMUX_TX_FUNC);
+    DL_GPIO_initPeripheralInputFunction(
+        GPIO_user_IOMUX_RX, GPIO_user_IOMUX_RX_FUNC);
 
     DL_GPIO_initPeripheralOutputFunction(
         GPIO_SPI_LCD_IOMUX_SCLK, GPIO_SPI_LCD_IOMUX_SCLK_FUNC);
@@ -180,6 +184,8 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
         GPIO_SPI_LCD_IOMUX_PICO, GPIO_SPI_LCD_IOMUX_PICO_FUNC);
     DL_GPIO_initPeripheralInputFunction(
         GPIO_SPI_LCD_IOMUX_POCI, GPIO_SPI_LCD_IOMUX_POCI_FUNC);
+
+    DL_GPIO_initDigitalOutput(LED_LED_0_IOMUX);
 
     DL_GPIO_initDigitalOutput(XSHUT_XSHUT1_IOMUX);
 
@@ -205,6 +211,18 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 
     DL_GPIO_initDigitalOutput(LCD_BLK_IOMUX);
 
+    DL_GPIO_initDigitalInputFeatures(KEY_KEY2_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(KEY_KEY1_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(KEY_KEY3_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
     DL_GPIO_clearPins(GPIOA, XSHUT_XSHUT1_PIN |
 		LINE_FOLLOW_AD0_X1_PIN |
 		LINE_FOLLOW_AD1_X2_PIN |
@@ -213,13 +231,15 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 		LINE_FOLLOW_AD0_X1_PIN |
 		LINE_FOLLOW_AD1_X2_PIN |
 		LINE_FOLLOW_AD2_X3_PIN);
-    DL_GPIO_clearPins(GPIOB, XSHUT_XSHUT2_PIN |
+    DL_GPIO_clearPins(GPIOB, LED_LED_0_PIN |
+		XSHUT_XSHUT2_PIN |
 		XSHUT_XSHUT3_PIN |
 		LCD_RES_PIN |
 		LCD_DC_PIN |
 		LCD_CS_PIN |
 		LCD_BLK_PIN);
-    DL_GPIO_enableOutput(GPIOB, XSHUT_XSHUT2_PIN |
+    DL_GPIO_enableOutput(GPIOB, LED_LED_0_PIN |
+		XSHUT_XSHUT2_PIN |
 		XSHUT_XSHUT3_PIN |
 		LCD_RES_PIN |
 		LCD_DC_PIN |
@@ -249,6 +269,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_SYSCTL_init(void)
     DL_SYSCTL_setBORThreshold(DL_SYSCTL_BOR_THRESHOLD_LEVEL_0);
     DL_SYSCTL_setFlashWaitState(DL_SYSCTL_FLASH_WAIT_STATE_2);
 
+    
 	DL_SYSCTL_setSYSOSCFreq(DL_SYSCTL_SYSOSC_FREQ_BASE);
 	/* Set default configuration */
 	DL_SYSCTL_disableHFXT();
@@ -304,6 +325,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_PWM_0_init(void) {
     DL_TimerG_enableClock(PWM_0_INST);
 
 
+    
     DL_TimerG_setCCPDirection(PWM_0_INST , DL_TIMER_CC0_OUTPUT | DL_TIMER_CC1_OUTPUT );
 
 
@@ -351,10 +373,12 @@ SYSCONFIG_WEAK void SYSCFG_DL_SERVO_1_init(void) {
     DL_TimerA_enableClock(SERVO_1_INST);
 
 
+    
     DL_TimerA_setCCPDirection(SERVO_1_INST , DL_TIMER_CC0_OUTPUT | DL_TIMER_CC1_OUTPUT );
 
 
 }
+
 
 
 /*
@@ -409,44 +433,24 @@ SYSCONFIG_WEAK void SYSCFG_DL_I2C_VL53L0X_init(void) {
     DL_I2C_setAnalogGlitchFilterPulseWidth(I2C_VL53L0X_INST,
         DL_I2C_ANALOG_GLITCH_FILTER_WIDTH_50NS);
     DL_I2C_enableAnalogGlitchFilter(I2C_VL53L0X_INST);
+    DL_I2C_setDigitalGlitchFilterPulseWidth(I2C_VL53L0X_INST,
+        DL_I2C_DIGITAL_GLITCH_FILTER_WIDTH_CLOCKS_1);
+
+    /* Configure Controller Mode */
+    DL_I2C_resetControllerTransfer(I2C_VL53L0X_INST);
+    /* Set frequency to 100000 Hz*/
+    DL_I2C_setTimerPeriod(I2C_VL53L0X_INST, 39);
+    DL_I2C_setControllerTXFIFOThreshold(I2C_VL53L0X_INST, DL_I2C_TX_FIFO_LEVEL_EMPTY);
+    DL_I2C_setControllerRXFIFOThreshold(I2C_VL53L0X_INST, DL_I2C_RX_FIFO_LEVEL_BYTES_1);
+    DL_I2C_enableControllerClockStretching(I2C_VL53L0X_INST);
 
 
+    /* Enable module */
+    DL_I2C_enableController(I2C_VL53L0X_INST);
 
 
 }
 
-
-static const DL_UART_Main_ClockConfig guserClockConfig = {
-    .clockSel    = DL_UART_MAIN_CLOCK_MFCLK,
-    .divideRatio = DL_UART_MAIN_CLOCK_DIVIDE_RATIO_1
-};
-
-static const DL_UART_Main_Config guserConfig = {
-    .mode        = DL_UART_MAIN_MODE_NORMAL,
-    .direction   = DL_UART_MAIN_DIRECTION_TX_RX,
-    .flowControl = DL_UART_MAIN_FLOW_CONTROL_NONE,
-    .parity      = DL_UART_MAIN_PARITY_NONE,
-    .wordLength  = DL_UART_MAIN_WORD_LENGTH_8_BITS,
-    .stopBits    = DL_UART_MAIN_STOP_BITS_ONE
-};
-
-SYSCONFIG_WEAK void SYSCFG_DL_user_init(void)
-{
-    DL_UART_Main_setClockConfig(user_INST, (DL_UART_Main_ClockConfig *) &guserClockConfig);
-
-    DL_UART_Main_init(user_INST, (DL_UART_Main_Config *) &guserConfig);
-    /*
-     * Configure baud rate by setting oversampling and baud rate divisors.
-     *  Target baud rate: 115200
-     *  Actual baud rate: 115107.91
-     */
-    DL_UART_Main_setOversampling(user_INST, DL_UART_OVERSAMPLING_RATE_16X);
-    DL_UART_Main_setBaudRateDivisor(user_INST, user_IBRD_4_MHZ_115200_BAUD, user_FBRD_4_MHZ_115200_BAUD);
-
-
-
-    DL_UART_Main_enable(user_INST);
-}
 
 static const DL_UART_Main_ClockConfig gMSPMotorClockConfig = {
     .clockSel    = DL_UART_MAIN_CLOCK_MFCLK,
@@ -518,7 +522,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_IMU_init(void)
     DL_UART_Main_enableInterrupt(IMU_INST,
                                  DL_UART_MAIN_INTERRUPT_RX);
     /* Setting the Interrupt Priority */
-    NVIC_SetPriority(IMU_INST_INT_IRQN, 1);
+    NVIC_SetPriority(IMU_INST_INT_IRQN, 2);
 
 
     DL_UART_Main_enable(IMU_INST);
@@ -556,6 +560,38 @@ SYSCONFIG_WEAK void SYSCFG_DL_Vision_init(void)
     DL_UART_Main_enable(Vision_INST);
 }
 
+static const DL_UART_Main_ClockConfig guserClockConfig = {
+    .clockSel    = DL_UART_MAIN_CLOCK_MFCLK,
+    .divideRatio = DL_UART_MAIN_CLOCK_DIVIDE_RATIO_1
+};
+
+static const DL_UART_Main_Config guserConfig = {
+    .mode        = DL_UART_MAIN_MODE_NORMAL,
+    .direction   = DL_UART_MAIN_DIRECTION_TX_RX,
+    .flowControl = DL_UART_MAIN_FLOW_CONTROL_NONE,
+    .parity      = DL_UART_MAIN_PARITY_NONE,
+    .wordLength  = DL_UART_MAIN_WORD_LENGTH_8_BITS,
+    .stopBits    = DL_UART_MAIN_STOP_BITS_ONE
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_user_init(void)
+{
+    DL_UART_Main_setClockConfig(user_INST, (DL_UART_Main_ClockConfig *) &guserClockConfig);
+
+    DL_UART_Main_init(user_INST, (DL_UART_Main_Config *) &guserConfig);
+    /*
+     * Configure baud rate by setting oversampling and baud rate divisors.
+     *  Target baud rate: 115200
+     *  Actual baud rate: 115107.91
+     */
+    DL_UART_Main_setOversampling(user_INST, DL_UART_OVERSAMPLING_RATE_16X);
+    DL_UART_Main_setBaudRateDivisor(user_INST, user_IBRD_4_MHZ_115200_BAUD, user_FBRD_4_MHZ_115200_BAUD);
+
+
+
+    DL_UART_Main_enable(user_INST);
+}
+
 static const DL_SPI_Config gSPI_LCD_config = {
     .mode        = DL_SPI_MODE_CONTROLLER,
     .frameFormat = DL_SPI_FRAME_FORMAT_MOTO3_POL0_PHA0,
@@ -588,6 +624,27 @@ SYSCONFIG_WEAK void SYSCFG_DL_SPI_LCD_init(void) {
     DL_SPI_enable(SPI_LCD_INST);
 }
 
+/* ADC_BAT Initialization */
+static const DL_ADC12_ClockConfig gADC_BATClockConfig = {
+    .clockSel       = DL_ADC12_CLOCK_ULPCLK,
+    .divideRatio    = DL_ADC12_CLOCK_DIVIDE_8,
+    .freqRange      = DL_ADC12_CLOCK_FREQ_RANGE_32_TO_40,
+};
+SYSCONFIG_WEAK void SYSCFG_DL_ADC_BAT_init(void)
+{
+    DL_ADC12_setClockConfig(ADC_BAT_INST, (DL_ADC12_ClockConfig *) &gADC_BATClockConfig);
+    DL_ADC12_configConversionMem(ADC_BAT_INST, ADC_BAT_ADCMEM_0,
+        DL_ADC12_INPUT_CHAN_0, DL_ADC12_REFERENCE_VOLTAGE_VDDA, DL_ADC12_SAMPLE_TIMER_SOURCE_SCOMP0, DL_ADC12_AVERAGING_MODE_DISABLED,
+        DL_ADC12_BURN_OUT_SOURCE_DISABLED, DL_ADC12_TRIGGER_MODE_TRIGGER_NEXT, DL_ADC12_WINDOWS_COMP_MODE_DISABLED);
+    DL_ADC12_setPowerDownMode(ADC_BAT_INST,DL_ADC12_POWER_DOWN_MODE_MANUAL);
+    DL_ADC12_setSampleTime0(ADC_BAT_INST,1250);
+    DL_ADC12_setSampleTime1(ADC_BAT_INST,1250);
+    /* Enable ADC12 interrupt */
+    DL_ADC12_clearInterruptStatus(ADC_BAT_INST,(DL_ADC12_INTERRUPT_MEM0_RESULT_LOADED));
+    DL_ADC12_enableInterrupt(ADC_BAT_INST,(DL_ADC12_INTERRUPT_MEM0_RESULT_LOADED));
+    DL_ADC12_enableConversions(ADC_BAT_INST);
+}
+
 SYSCONFIG_WEAK void SYSCFG_DL_SYSTICK_init(void)
 {
     /*
@@ -596,3 +653,4 @@ SYSCONFIG_WEAK void SYSCFG_DL_SYSTICK_init(void)
      */
     DL_SYSTICK_config(80000);
 }
+

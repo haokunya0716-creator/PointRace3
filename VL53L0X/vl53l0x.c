@@ -12,7 +12,7 @@ typedef enum {
  * HIGH_ACCURACY 精度更高，但一次测距时间更长；
  * HIGH_SPEED 速度更快，但稳定性和精度会低一些；
  * LONG_RANGE 用于更远距离，响应也会相对慢一些。 */
-RangingConfig_e RangingConfig = HIGH_ACCURACY;
+RangingConfig_e RangingConfig = HIGH_SPEED;
 
 /* 旧版单传感器接口使用的设备对象。
  * 三路传感器现在由 Application/app_vl5310x.c 管理。 */

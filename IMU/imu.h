@@ -3,7 +3,7 @@
 
 #include "ti_msp_dl_config.h"
 #include <stdio.h>
-
+extern volatile unsigned char imu_data;
 struct SAngle
 {
     volatile float Yaw; // 使用 volatile 确保主函数每次都从内存中读取最新值

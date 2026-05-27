@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\third_party\CMSIS\Core\Include;..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\ti\driverlib;..\..\..\mspm0_sdk_2_02_00_05;..\..\PointRace3;..\MSPM0;..\VL53L0X;..\Application;..\LCD;..\Board;..\LCD;..\PID</IncludePath>
+              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\third_party\CMSIS\Core\Include;..\source;..\MSP_Motor_Ctrl;..\MSPM0;..\IMU;..\Application;..\..\PointRace3;..\source\ti\driverlib;..\..\..\mspm0_sdk_2_02_00_05;..\..\PointRace3;..\MSPM0;..\VL53L0X;..\Application;..\LCD;..\Board;..\LCD;..\PID;..\Button;..\hardware\sast_lib_st7735s;..\hardware;..\hardware;..\Application</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -545,6 +545,26 @@
               <FilePath>..\Application\app_PWM.h</FilePath>
             </File>
             <File>
+              <FileName>app_basic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\app_basic.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_basic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\app_basic.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_extend.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\app_extend.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_extend.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\app_extend.h</FilePath>
+            </File>
+            <File>
               <FileName>app_motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\app_motor.c</FilePath>
@@ -553,6 +573,26 @@
               <FileName>app_motor.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\app_motor.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app_button.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_button.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\app_button.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_bat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app_bat.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_bat.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\app_bat.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -667,41 +707,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>LCD</GroupName>
-          <Files>
-            <File>
-              <FileName>lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LCD\lcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\LCD\lcd.h</FilePath>
-            </File>
-            <File>
-              <FileName>lcd_init.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LCD\lcd_init.c</FilePath>
-            </File>
-            <File>
-              <FileName>lcd_init.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\LCD\lcd_init.h</FilePath>
-            </File>
-            <File>
-              <FileName>lcdfont.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\LCD\lcdfont.h</FilePath>
-            </File>
-            <File>
-              <FileName>pic.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\LCD\pic.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Board</GroupName>
           <Files>
             <File>
@@ -728,6 +733,51 @@
               <FileName>pid.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\PID\pid.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Button</GroupName>
+          <Files>
+            <File>
+              <FileName>button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Button\button.c</FilePath>
+            </File>
+            <File>
+              <FileName>button.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Button\button.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hardware</GroupName>
+          <Files>
+            <File>
+              <FileName>sast_lib_st7735s.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hardware\sast_lib_st7735s.c</FilePath>
+            </File>
+            <File>
+              <FileName>sast_lib_st7735s.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\hardware\sast_lib_st7735s.h</FilePath>
+            </File>
+            <File>
+              <FileName>sast_lib_st7735s_chinese_font.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hardware\sast_lib_st7735s_chinese_font.c</FilePath>
+            </File>
+            <File>
+              <FileName>sast_lib_st7735s_font.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\hardware\sast_lib_st7735s_font.h</FilePath>
+            </File>
+            <File>
+              <FileName>sast_lib_st7735s_pic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hardware\sast_lib_st7735s_pic.c</FilePath>
             </File>
           </Files>
         </Group>

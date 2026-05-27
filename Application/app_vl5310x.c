@@ -77,9 +77,7 @@ static void XshutInit(void)
 {
     for (uint8_t i = 0; i < VL5310X_COUNT; i++)
     {
-        DL_GPIO_initDigitalOutput(xshut_pin[i].iomux);
         DL_GPIO_clearPins(xshut_pin[i].port, xshut_pin[i].pin);
-        DL_GPIO_enableOutput(xshut_pin[i].port, xshut_pin[i].pin);
     }
 }
 
