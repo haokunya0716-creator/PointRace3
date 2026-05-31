@@ -1,0 +1,28 @@
+# Keil build output
+keil/Objects/
+keil/Listings/
+*.axf
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.crf
+*.o
+*.d
+
+# Keil/user-local workspace state
+*.uvguix.*
+*.uvgui.*
+*.uvopt
+*.dep
+JLinkLog.txt
+JLinkSettings.ini
+
+# Editor/OS noise
+.vscode/
+.idea/
+*.swp
+*.tmp
+Thumbs.db
+Desktop.ini
