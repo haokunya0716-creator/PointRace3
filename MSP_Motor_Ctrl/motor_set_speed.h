@@ -18,6 +18,7 @@ void Motor_Set_ClosedLoop(void);//设置电机进入闭环
 void Motor_Set_Speeds(int16_t v0, int16_t v1, int16_t v2, int16_t v3);//设置电机速度
 
 void Modbus_ParseFrame(uint8_t data);
+void Motor_Clear_Encoders(void);
 
 
 //编码器极性取反

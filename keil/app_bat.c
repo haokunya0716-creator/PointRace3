@@ -41,7 +41,7 @@ void ADC_BAT_INST_IRQHandler(void)
             volt = volt * 0.9f + now * 0.1f;
 
         volt100 = (uint16_t)(volt * 100.0f + 0.5f);
-			DL_GPIO_togglePins(LED_PORT, LED_LED_0_PIN);
+			DL_GPIO_togglePins(LED_LED_0_PORT, LED_LED_0_PIN);
 			
 			DL_ADC12_enableConversions(ADC_BAT_INST);
     }

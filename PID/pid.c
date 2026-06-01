@@ -76,12 +76,7 @@ float PID_Compute(PID_TypeDef *PID, float FB)
 	}
 
 	float COp = PID->Kp * err;
-	float COi = 0;
-	if(err <= 5.5f && err >= -5.5f){
-	
-		float COi = PID->Ki * err_int;
-		
-	}
+	float COi = PID->Ki * err_int;
 	float COd = PID->Kd * err_dev;
 	float CO = COp + COi + COd;
 
@@ -98,10 +93,6 @@ float PID_Compute(PID_TypeDef *PID, float FB)
 	if(PID->err_int_k_1 > PID->UpperLimit) PID->err_int_k_1 = PID->UpperLimit;
 	if(PID->err_int_k_1 < PID->LowerLimit) PID->err_int_k_1 = PID->LowerLimit;
 	
-	
-	if(err <=0.6f && err >= -0.6f){
-		CO = 0;
-	}
 
 	return CO;
 }

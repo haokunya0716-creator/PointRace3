@@ -5,6 +5,7 @@ extern volatile unsigned long tick_ms;
 
 int mspm0_delay_ms(unsigned long num_ms);
 int mspm0_get_clock_ms(unsigned long *count);
+uint32_t HAL_GetTick(void);
 void SysTick_Init(void);
 
 #endif  /* #ifndef _CLOCK_H_ */

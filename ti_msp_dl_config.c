@@ -185,8 +185,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
     DL_GPIO_initPeripheralInputFunction(
         GPIO_SPI_LCD_IOMUX_POCI, GPIO_SPI_LCD_IOMUX_POCI_FUNC);
 
-    DL_GPIO_initDigitalOutput(LED_LED_0_IOMUX);
-
     DL_GPIO_initDigitalOutput(XSHUT_XSHUT1_IOMUX);
 
     DL_GPIO_initDigitalOutput(XSHUT_XSHUT2_IOMUX);
@@ -223,28 +221,34 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
 		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
+    DL_GPIO_initDigitalOutput(LED_LED_0_IOMUX);
+
+    DL_GPIO_initDigitalOutput(LED_LED_1_IOMUX);
+
     DL_GPIO_clearPins(GPIOA, XSHUT_XSHUT1_PIN |
 		LINE_FOLLOW_AD0_X1_PIN |
 		LINE_FOLLOW_AD1_X2_PIN |
-		LINE_FOLLOW_AD2_X3_PIN);
+		LINE_FOLLOW_AD2_X3_PIN |
+		LED_LED_1_PIN);
     DL_GPIO_enableOutput(GPIOA, XSHUT_XSHUT1_PIN |
 		LINE_FOLLOW_AD0_X1_PIN |
 		LINE_FOLLOW_AD1_X2_PIN |
-		LINE_FOLLOW_AD2_X3_PIN);
-    DL_GPIO_clearPins(GPIOB, LED_LED_0_PIN |
-		XSHUT_XSHUT2_PIN |
+		LINE_FOLLOW_AD2_X3_PIN |
+		LED_LED_1_PIN);
+    DL_GPIO_clearPins(GPIOB, XSHUT_XSHUT2_PIN |
 		XSHUT_XSHUT3_PIN |
 		LCD_RES_PIN |
 		LCD_DC_PIN |
 		LCD_CS_PIN |
-		LCD_BLK_PIN);
-    DL_GPIO_enableOutput(GPIOB, LED_LED_0_PIN |
-		XSHUT_XSHUT2_PIN |
+		LCD_BLK_PIN |
+		LED_LED_0_PIN);
+    DL_GPIO_enableOutput(GPIOB, XSHUT_XSHUT2_PIN |
 		XSHUT_XSHUT3_PIN |
 		LCD_RES_PIN |
 		LCD_DC_PIN |
 		LCD_CS_PIN |
-		LCD_BLK_PIN);
+		LCD_BLK_PIN |
+		LED_LED_0_PIN);
 
 }
 
@@ -398,7 +402,7 @@ static const DL_TimerA_ClockConfig gTIMER_0ClockConfig = {
  */
 static const DL_TimerA_TimerConfig gTIMER_0TimerConfig = {
     .period     = TIMER_0_INST_LOAD_VALUE,
-    .timerMode  = DL_TIMER_TIMER_MODE_PERIODIC_UP,
+    .timerMode  = DL_TIMER_TIMER_MODE_PERIODIC,
     .startTimer = DL_TIMER_STOP,
 };
 
@@ -409,8 +413,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_TIMER_0_init(void) {
 
     DL_TimerA_initTimerMode(TIMER_0_INST,
         (DL_TimerA_TimerConfig *) &gTIMER_0TimerConfig);
-    DL_TimerA_enableInterrupt(TIMER_0_INST , DL_TIMERA_INTERRUPT_LOAD_EVENT |
-		DL_TIMERA_INTERRUPT_ZERO_EVENT);
+    DL_TimerA_enableInterrupt(TIMER_0_INST , DL_TIMERA_INTERRUPT_ZERO_EVENT);
 	NVIC_SetPriority(TIMER_0_INST_INT_IRQN, 2);
     DL_TimerA_enableClock(TIMER_0_INST);
 
@@ -483,8 +486,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_MSPMotor_init(void)
     /* Configure Interrupts */
     DL_UART_Main_enableInterrupt(MSPMotor_INST,
                                  DL_UART_MAIN_INTERRUPT_RX);
-    /* Setting the Interrupt Priority */
-    NVIC_SetPriority(MSPMotor_INST_INT_IRQN, 1);
 
 
     DL_UART_Main_enable(MSPMotor_INST);

@@ -4,12 +4,13 @@
 #include "task.h"
 #include "motor_read_enc.h"
 #include "motor_set_speed.h"
+#include "imu.h"
 static PID_TypeDef pid_position_l; // 电机位置闭环的PID控制器
 static PID_TypeDef pid_position_r; 
 
 extern volatile int16_t	modbus_date[8];//电机反馈		
 
-int16_t motor_right_speed,motor_left_speed = 0;//电机速度
+float motor_right_speed,motor_left_speed = 0;//电机速度
 
 int16_t motor_encoder1,motor_encoder2 = 0;//编码器值
 float position_l,position_r = 0;//累计走过的c
@@ -18,7 +19,7 @@ float position_l_ref,position_r_ref = 0;//位置期望值
 
 
 static PID_TypeDef pid_angle_yaw;
-float angle_yaw = 0;//当前的角度值
+volatile float angle_yaw = 0;//当前的角度值
 //
 // @简介：速度转换，设置速度的单位为r/s，反馈值为编码器每30ms
 //
@@ -65,9 +66,9 @@ static float compute_position_output(float position_measure){
 void App_Motor_Init(void)
 {
 
-    PID_Init(&pid_position_l,0.12, 0.04, 0);
+    PID_Init(&pid_position_l,0.0900, 0.0, 0);
     PID_LimitConfig(&pid_position_l, +500.0f, -500.0f);
-	  PID_Init(&pid_position_r, 0.12, 0.04, 0);
+	  PID_Init(&pid_position_r, 0.09, 0.0, 0);
     PID_LimitConfig(&pid_position_r, +500.0f, -500.0f);
 	
 		PID_Init(&pid_angle_yaw, 0.12, 0.04, 0);
@@ -80,7 +81,7 @@ void App_Motor_Init(void)
 // @简介：更新陀螺仪角度和实际走过的距离
 //
 void App_Update_Data(void){
-	
+
 	angle_yaw = getYaw();
 
 	motor_encoder1 = modbus_date[0];//左右电机的编码器值
@@ -120,7 +121,7 @@ void App_Position_Pro(void){
 	App_Update_Data();
 	
 	
-	motor_left_speed = - PID_Compute(&pid_position_l,position_l);
+	motor_left_speed =  PID_Compute(&pid_position_l,position_l);
 	motor_right_speed = PID_Compute(&pid_position_r,position_r);
 	
 	
@@ -131,8 +132,8 @@ void App_Position_Pro(void){
 	
 	PERIODIC_END
 	
-	PERIODIC_START(PRINT_POSITION,30)
-	printf("%f,%f,%f\n",pid_position_l.SP,position_l,(float)motor_left_speed);
+	PERIODIC_START(PRINT_POSITION,200)
+	printf("%f,%f,%.2f\n",pid_position_r.SP,position_r, stcAngle.Yaw);
 
 	PERIODIC_END
 }
@@ -140,13 +141,16 @@ void App_Position_Pro(void){
 //pi/2*20.5
 void Turn_Right_90(void){//向右转90度
 	
-	float encoder_l_change = PI*10.250f;
-	Set_Position_SP_L(encoder_l_change);
-	
+	uint32_t time = HAL_GetTick();
+	while(HAL_GetTick() - time < 880){
+		PERIODIC_START(TURN_RIGHT,30)
+			App_Set_Speed(1.0f,-1.0f);
+		PERIODIC_END
+	}
 }
 void Turn_Left_90(void){//向左转90°
 
-	float encoder_r_change = PI*10.250f;
+	float encoder_r_change = PI * 9.0f;
 	Set_Position_SP_R(encoder_r_change);
 	
 }

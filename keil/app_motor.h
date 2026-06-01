@@ -13,6 +13,7 @@
 
 void App_Motor_Init(void);
 void App_Update_Data(void);
+void App_PID_Reset(void);
 
 void Set_Position_SP_L(float position_ref);
 void Set_Position_SP_R(float position_ref);
@@ -22,4 +23,7 @@ void App_Angle_Pro(void);
 void App_Set_Speed(float speed_l,float speed_r); //单位：r/s
 void Turn_Right_90(void);//向右转90度
 void Turn_Left_90(void);//向左转90°
+
+extern float position_l;
+extern float position_r;
 #endif

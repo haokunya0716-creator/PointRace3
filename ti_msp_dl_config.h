@@ -240,12 +240,6 @@ extern "C" {
 
 
 
-/* Port definition for Pin Group LED */
-#define LED_PORT                                                         (GPIOB)
-
-/* Defines for LED_0: GPIOB.22 with pinCMx 50 on package pin 21 */
-#define LED_LED_0_PIN                                           (DL_GPIO_PIN_22)
-#define LED_LED_0_IOMUX                                          (IOMUX_PINCM50)
 /* Defines for XSHUT1: GPIOA.31 with pinCMx 6 on package pin 39 */
 #define XSHUT_XSHUT1_PORT                                                (GPIOA)
 #define XSHUT_XSHUT1_PIN                                        (DL_GPIO_PIN_31)
@@ -300,6 +294,14 @@ extern "C" {
 /* Defines for KEY3: GPIOA.9 with pinCMx 20 on package pin 55 */
 #define KEY_KEY3_PIN                                             (DL_GPIO_PIN_9)
 #define KEY_KEY3_IOMUX                                           (IOMUX_PINCM20)
+/* Defines for LED_0: GPIOB.22 with pinCMx 50 on package pin 21 */
+#define LED_LED_0_PORT                                                   (GPIOB)
+#define LED_LED_0_PIN                                           (DL_GPIO_PIN_22)
+#define LED_LED_0_IOMUX                                          (IOMUX_PINCM50)
+/* Defines for LED_1: GPIOA.22 with pinCMx 47 on package pin 18 */
+#define LED_LED_1_PORT                                                   (GPIOA)
+#define LED_LED_1_PIN                                           (DL_GPIO_PIN_22)
+#define LED_LED_1_IOMUX                                          (IOMUX_PINCM47)
 
 
 

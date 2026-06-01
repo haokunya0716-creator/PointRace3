@@ -27,8 +27,6 @@ float getGyroZ(void);
 float getYaw(void);
 void sendCaliYawCommand(void);
 void performCaliBias(void);
-void ChangeBuad38400(void);
-void ChangeBuad9600(void);
 void delay_us(int __us);
 void delay_ms(int __ms);
 

@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\PointRace3_last;..\Application;..\Board;..\Button;..\hardware;..\IMU;..\keil;..\LCD;..\MSP_Motor_Ctrl;..\MSPM0;..\PID;..\source;..\ti;..\VL53L0X;..\source\third_party\CMSIS\Core\Include;..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\App_Task</IncludePath>
+              <IncludePath>..;..\Application;..\Board;..\Button;..\hardware;..\IMU;..\keil;..\LCD;..\MSP_Motor_Ctrl;..\MSPM0;..\PID;..\source;..\ti;..\VL53L0X;..\source\third_party\CMSIS\Core\Include;..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\App_Task</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -374,7 +374,7 @@
             <ScatterFile>./mspm0g3507.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc>"D:\TI\M0_SDK\mspm0_sdk_2_02_00_05\Motor_ClosedLoop\source\ti\driverlib\lib\keil\m0p\mspm0g1x0x_g3x0x\driverlib.a"</Misc>
+            <Misc>"D:\TI\M0_SDK\mspm0_sdk_2_02_00_05\PointRace3\source\ti\driverlib\lib\keil\m0p\mspm0g1x0x_g3x0x\driverlib.a"</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>

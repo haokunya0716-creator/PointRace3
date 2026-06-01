@@ -77,8 +77,55 @@ void Motor_Set_Speeds(int16_t v0, int16_t v1, int16_t v2, int16_t v3)
 }
 
 
+/*
+ * 函数名：Motor_Clear_Encoders
+ * 功  能：同时清零 4 个电机的累计编码器数据
+ * 协  议：向寄存器 0x0004 开始的 4 个寄存器写入 0
+ */
+void Motor_Clear_Encoders(void)
+{
+    uint8_t idx = 0;
+    uint8_t frame[20];
 
-void Motor_Set_Enc1_A(void)
+    frame[idx++] = 0x0A;        // 从站地址 (驱动器 ID)
+    frame[idx++] = 0x10;        // 功能码：写多个保持寄存器
+
+    frame[idx++] = 0x00;        // 起始寄存器高字节
+    frame[idx++] = 0x04;        // 起始寄存器低字节 (地址 0x0004)
+
+    frame[idx++] = 0x00;        // 寄存器数量高字节
+    frame[idx++] = 0x04;        // 寄存器数量低字节（共 4 个寄存器）
+	
+    frame[idx++] = 0x08;        // 数据字节数 = 4 × 2 = 8
+
+    // 数据区：全部填入 0x00，代表清零
+    frame[idx++] = 0x00;        // 电机 1 累计编码器高字节
+    frame[idx++] = 0x00;        // 电机 1 累计编码器低字节
+
+    frame[idx++] = 0x00;        // 电机 2 累计编码器高字节
+    frame[idx++] = 0x00;        // 电机 2 累计编码器低字节
+
+    frame[idx++] = 0x00;        // 电机 3 累计编码器高字节
+    frame[idx++] = 0x00;        // 电机 3 累计编码器低字节
+
+    frame[idx++] = 0x00;        // 电机 4 累计编码器高字节
+    frame[idx++] = 0x00;        // 电机 4 累计编码器低字节
+
+    // 计算 CRC 校验
+    uint16_t crc = CRC16(frame, idx);
+    frame[idx++] = crc & 0xFF;          // CRC 低字节 (CRC_L)
+    frame[idx++] = (crc >> 8) & 0xFF;   // CRC 高字节 (CRC_H)
+
+    // 通过 UART 发送
+    for (uint8_t i = 0; i < idx; i++)
+    {
+        while (DL_UART_isBusy(MSPMotor_INST));
+        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
+    }
+}
+
+
+		void Motor_Set_Enc1_A(void)
 {
 
 		uint8_t idx = 0;
