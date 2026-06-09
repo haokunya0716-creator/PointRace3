@@ -5,26 +5,26 @@
 #include "ti_msp_dl_config.h"
 #include "vl53l0x.h"
 
-#define VL5310X_FRONT_OBSTACLE_MM  250 // 前方避障阈值，单位 mm
-#define VL5310X_SIDE_OBSTACLE_MM   180 // 左右避障阈值，单位 mm
+#define VL5310X_OBSTACLE_MIN_MM  20  // 避障识别最小距离，单位 mm
+#define VL5310X_OBSTACLE_MAX_MM  250 // 避障识别最大距离，单位 mm
 
 /**
  * @brief 三个 VL53L0X 的逻辑编号。
  * @note VL5310X_COUNT 是传感器数量，用来定义数组长度，非常置方便且简洁。
  */
 typedef enum {
-    VL5310X_FRONT = 0, // 前方传感器，物理引脚为 XSHUT2
+    VL5310X_FRONT = 0, // 前方传感器，物理引脚为 XSHUT3
     VL5310X_LEFT = 1,      // 左侧传感器，物理引脚为 XSHUT1
-    VL5310X_RIGHT = 2,     // 右侧传感器，物理引脚为 XSHUT3
+    VL5310X_RIGHT = 2,     // 右侧传感器，物理引脚为 XSHUT2
     VL5310X_COUNT = 3,   // 传感器数量：前、左、右，一共 3 个
 	} VL5310X_SensorId_t; //激光测距的枚举（前，左，右分别对应0，1，2。传感器总数为3）
 
 extern volatile uint16_t VL5310X_Distance_mm[VL5310X_COUNT]; // 三路最新距离，单位 mm
 
 
-extern volatile uint8_t vl5310x_front_obstacle_flag; // 前方障碍标志，1 表示距离小于 VL5310X_FRONT_OBSTACLE_MM
-extern volatile uint8_t vl5310x_left_obstacle_flag;  // 左侧障碍标志，1 表示距离小于 VL5310X_SIDE_OBSTACLE_MM
-extern volatile uint8_t vl5310x_right_obstacle_flag; // 右侧障碍标志，1 表示距离小于 VL5310X_SIDE_OBSTACLE_MM
+extern volatile uint8_t vl5310x_front_obstacle_flag; // 前方障碍标志，1 表示距离大于 2cm 且小于 25cm
+extern volatile uint8_t vl5310x_left_obstacle_flag;  // 左侧障碍标志，1 表示距离大于 2cm 且小于 25cm
+extern volatile uint8_t vl5310x_right_obstacle_flag; // 右侧障碍标志，1 表示距离大于 2cm 且小于 25cm
 
 /**
  * @brief 初始化三路 VL53L0X。

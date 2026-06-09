@@ -1,7 +1,6 @@
 #include "app_net.h"
 #include "app_vl5310x.h"
 #include "../keil/app_motor.h"
-#include "motor_set_speed.h"
 
 /*
  * 第二问遍历避障模块。
@@ -176,7 +175,7 @@ static void CarStop(void)
 {
     Set_Position_SP_L(0.0f);
     Set_Position_SP_R(0.0f);
-    Motor_Set_Speeds(0, 0, 0, 0);
+    App_Set_Speed(0.0f, 0.0f);
     move_active = 0;
 }
 

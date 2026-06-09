@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>..;..\Application;..\Board;..\Button;..\hardware;..\IMU;..\keil;..\LCD;..\MSP_Motor_Ctrl;..\MSPM0;..\PID;..\source;..\ti;..\VL53L0X;..\source\third_party\CMSIS\Core\Include;..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\App_Task</IncludePath>
+              <IncludePath>..;..\Application;..\Board;..\Button;..\hardware;..\IMU;..\keil;..\LCD;..\MSP_Motor_Ctrl;..\MSPM0;..\PID;..\source;..\ti;..\VL53L0X;..\source\third_party\CMSIS\Core\Include;..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\App_Task;..\Motor</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -414,36 +414,6 @@
         <Group>
           <GroupName>MSPMotor_Ctl</GroupName>
           <Files>
-            <File>
-              <FileName>motor_crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MSP_Motor_Ctrl\motor_crc.c</FilePath>
-            </File>
-            <File>
-              <FileName>motor_crc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\MSP_Motor_Ctrl\motor_crc.h</FilePath>
-            </File>
-            <File>
-              <FileName>motor_read_enc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MSP_Motor_Ctrl\motor_read_enc.c</FilePath>
-            </File>
-            <File>
-              <FileName>motor_read_enc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\MSP_Motor_Ctrl\motor_read_enc.h</FilePath>
-            </File>
-            <File>
-              <FileName>motor_set_speed.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MSP_Motor_Ctrl\motor_set_speed.c</FilePath>
-            </File>
-            <File>
-              <FileName>motor_set_speed.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\MSP_Motor_Ctrl\motor_set_speed.h</FilePath>
-            </File>
             <File>
               <FileName>user.c</FileName>
               <FileType>1</FileType>
@@ -545,16 +515,6 @@
               <FilePath>..\Application\app_PWM.h</FilePath>
             </File>
             <File>
-              <FileName>app_net.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\app_net.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_net.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Application\app_net.h</FilePath>
-            </File>
-            <File>
               <FileName>app_button.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\app_button.c</FilePath>
@@ -583,6 +543,16 @@
               <FileName>app_motor.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\app_motor.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_speed.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app_speed.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_speed.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\app_speed.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -742,36 +712,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hardware</GroupName>
-          <Files>
-            <File>
-              <FileName>sast_lib_st7735s.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\hardware\sast_lib_st7735s.c</FilePath>
-            </File>
-            <File>
-              <FileName>sast_lib_st7735s.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\hardware\sast_lib_st7735s.h</FilePath>
-            </File>
-            <File>
-              <FileName>sast_lib_st7735s_chinese_font.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\hardware\sast_lib_st7735s_chinese_font.c</FilePath>
-            </File>
-            <File>
-              <FileName>sast_lib_st7735s_font.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\hardware\sast_lib_st7735s_font.h</FilePath>
-            </File>
-            <File>
-              <FileName>sast_lib_st7735s_pic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\hardware\sast_lib_st7735s_pic.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>App_Task</GroupName>
           <Files>
             <File>
@@ -783,6 +723,31 @@
               <FileName>app_task.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\app_task.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Motor</GroupName>
+          <Files>
+            <File>
+              <FileName>motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\motor.h</FilePath>
+            </File>
+            <File>
+              <FileName>motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\app_encoder.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app_encoder.c</FilePath>
             </File>
           </Files>
         </Group>

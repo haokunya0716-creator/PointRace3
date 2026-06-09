@@ -1,5 +1,19 @@
 #include "motor_set_speed.h"
 
+static void Motor_UART3_SendFrame(uint8_t *frame, uint8_t len)
+{
+    uint8_t i = 0;
+
+    for (i = 0; i < len; i++)
+    {
+        while (DL_UART_isBusy(MSPMotor_INST));
+        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
+    }
+
+    while (DL_UART_isBusy(MSPMotor_INST));
+}
+
+
 
 
 
@@ -9,14 +23,13 @@ void Motor_Set_ClosedLoop(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // Â´Ó•Â¾ÂµØ–Â·
+    frame[idx++] = 0x06;        // Â¹Â¦ÄœÂ«Â£ÂºĞ´ÂµÂ¥Â¸Ã¶Â±Â£Â³Ö¼Ä´æ†·
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x08;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
-
+    frame[idx++] = 0x00;        // Register address high byte.
+    frame[idx++] = 0x08;        // Register address low byte.
   
-    // ¼Ä´æÆ÷ 1
+    // Â¼Ä´æ†· 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -24,12 +37,8 @@ void Motor_Set_ClosedLoop(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    // Â·Â¢Ë
+    Motor_UART3_SendFrame(frame, idx);
 }
 
 
@@ -39,16 +48,15 @@ void Motor_Set_Speeds(int16_t v0, int16_t v1, int16_t v2, int16_t v3)
     uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x10;        // ¹¦ÄÜÂë£ºĞ´¶à¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // Â´Ó•Â¾ÂµØ–Â·
+    frame[idx++] = 0x10;        // Â¹Â¦ÄœÂ«Â£ÂºĞ´Â¶à¸¶Â±Â£Â³Ö¼Ä´æ†·
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
-
-    frame[idx++] = 0x00;        // ¼Ä´æÆ÷ÊıÁ¿¸ß×Ö½Ú
-    frame[idx++] = 0x04;        // ¼Ä´æÆ÷ÊıÁ¿µÍ×Ö½Ú£¨4 ¸ö£©
+    frame[idx++] = 0x00;        // Start register high byte.
+    frame[idx++] = 0x00;        // Start register low byte.
+    frame[idx++] = 0x00;        // Register count high byte.
+    frame[idx++] = 0x04;        // Register count low byte: 4 registers.
 	
-    frame[idx++] = 0x08;        // Êı¾İ×Ö½ÚÊı = 4 ¡Á 2 = 8
+    frame[idx++] = 0x08;        // Ê½Â¾İ—Ö½ÚŠÃ½ = 4 Â¡Ã 2 = 8
 
 
     frame[idx++] = (v0 >> 8) & 0xFF;
@@ -68,12 +76,8 @@ void Motor_Set_Speeds(int16_t v0, int16_t v1, int16_t v2, int16_t v3)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    // Â·Â¢Ë
+    Motor_UART3_SendFrame(frame, idx);
 }
 
 
@@ -117,11 +121,7 @@ void Motor_Clear_Encoders(void)
     frame[idx++] = (crc >> 8) & 0xFF;   // CRC é«˜å­—èŠ‚ (CRC_H)
 
     // é€šè¿‡ UART å‘é€
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    Motor_UART3_SendFrame(frame, idx);
 }
 
 
@@ -131,14 +131,13 @@ void Motor_Clear_Encoders(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // Â´Ó•Â¾ÂµØ–Â·
+    frame[idx++] = 0x06;        // Â¹Â¦ÄœÂ«Â£ÂºĞ´ÂµÂ¥Â¸Ã¶Â±Â£Â³Ö¼Ä´æ†·
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x09;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
-
+    frame[idx++] = 0x00;        // Register address high byte.
+    frame[idx++] = 0x09;        // Register address low byte.
   
-    // ¼Ä´æÆ÷ 1
+    // Â¼Ä´æ†· 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -146,12 +145,8 @@ void Motor_Clear_Encoders(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    // Â·Â¢Ë
+    Motor_UART3_SendFrame(frame, idx);
 }
 
 
@@ -161,14 +156,13 @@ void Motor_Set_Enc1_B(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // Â´Ó•Â¾ÂµØ–Â·
+    frame[idx++] = 0x06;        // Â¹Â¦ÄœÂ«Â£ÂºĞ´ÂµÂ¥Â¸Ã¶Â±Â£Â³Ö¼Ä´æ†·
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x0A;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
-
+    frame[idx++] = 0x00;        // Register address high byte.
+    frame[idx++] = 0x0A;        // Register address low byte.
   
-    // ¼Ä´æÆ÷ 1
+    // Â¼Ä´æ†· 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -176,12 +170,8 @@ void Motor_Set_Enc1_B(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    // Â·Â¢Ë
+    Motor_UART3_SendFrame(frame, idx);
 }
 
 void Motor_Set_Enc1_C(void)
@@ -190,14 +180,13 @@ void Motor_Set_Enc1_C(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // Â´Ó•Â¾ÂµØ–Â·
+    frame[idx++] = 0x06;        // Â¹Â¦ÄœÂ«Â£ÂºĞ´ÂµÂ¥Â¸Ã¶Â±Â£Â³Ö¼Ä´æ†·
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x0B;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
-
+    frame[idx++] = 0x00;        // Register address high byte.
+    frame[idx++] = 0x0B;        // Register address low byte.
   
-    // ¼Ä´æÆ÷ 1
+    // Â¼Ä´æ†· 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -205,12 +194,8 @@ void Motor_Set_Enc1_C(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    // Â·Â¢Ë
+    Motor_UART3_SendFrame(frame, idx);
 }
 
 void Motor_Set_Enc1_D(void)
@@ -219,14 +204,13 @@ void Motor_Set_Enc1_D(void)
 		uint8_t idx = 0;
 		uint8_t frame[20];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x06;        // ¹¦ÄÜÂë£ºĞ´µ¥¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // Â´Ó•Â¾ÂµØ–Â·
+    frame[idx++] = 0x06;        // Â¹Â¦ÄœÂ«Â£ÂºĞ´ÂµÂ¥Â¸Ã¶Â±Â£Â³Ö¼Ä´æ†·
 
-    frame[idx++] = 0x00;        // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-    frame[idx++] = 0x0C;        // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú
-
+    frame[idx++] = 0x00;        // Register address high byte.
+    frame[idx++] = 0x0C;        // Register address low byte.
   
-    // ¼Ä´æÆ÷ 1
+    // Â¼Ä´æ†· 1
     frame[idx++] = 0x00;
     frame[idx++] = 0x01;
 
@@ -234,12 +218,8 @@ void Motor_Set_Enc1_D(void)
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    // Â·Â¢Ë
+    Motor_UART3_SendFrame(frame, idx);
 }
 
 
@@ -262,16 +242,16 @@ void Motor_Set_KP_KI_KD(PID_t *Motor1, PID_t *Motor2, PID_t *Motor3, PID_t *Moto
     uint8_t idx = 0;
 		uint8_t frame[34];
 
-    frame[idx++] = 0x0A;        // ´ÓÕ¾µØÖ·
-    frame[idx++] = 0x10;        // ¹¦ÄÜÂë£ºĞ´¶à¸ö±£³Ö¼Ä´æÆ÷
+    frame[idx++] = 0x0A;        // Â´Ó•Â¾ÂµØ–Â·
+    frame[idx++] = 0x10;        // Â¹Â¦ÄœÂ«Â£ÂºĞ´Â¶à¸¶Â±Â£Â³Ö¼Ä´æ†·
 
-    frame[idx++] = 0x00;  // ÆğÊ¼¼Ä´æÆ÷¸ß×Ö½Ú
-		frame[idx++] = 0x15;  // ÆğÊ¼¼Ä´æÆ÷µÍ×Ö½Ú (21)
+    frame[idx++] = 0x00;        // Start register high byte.
+    frame[idx++] = 0x15;        // Start register low byte: 0x0015.
 	
-    frame[idx++] = 0x00;        // ¼Ä´æÆ÷ÊıÁ¿¸ß×Ö½Ú
-    frame[idx++] = 0x0C;        // ¼Ä´æÆ÷ÊıÁ¿µÍ×Ö½Ú£¨12 ¸ö£©
+    frame[idx++] = 0x00;        // Register count high byte.
+    frame[idx++] = 0x0C;        // Register count low byte: 12 registers.
 	
-    frame[idx++] = 0x18;   // Êı¾İ×Ö½ÚÊı = 12 ¡Á 2 = 24
+    frame[idx++] = 0x18;   // Ê½Â¾İ—Ö½ÚŠÃ½ = 12 Â¡Ã 2 = 24
 
 
 		Kp_Temp = (uint16_t)(Motor1->kp * 1000);
@@ -350,10 +330,6 @@ void Motor_Set_KP_KI_KD(PID_t *Motor1, PID_t *Motor2, PID_t *Motor3, PID_t *Moto
     frame[idx++] = crc & 0xFF;
     frame[idx++] = (crc >> 8) & 0xFF;
 
-    // ·¢ËÍ
-    for (uint8_t i = 0; i < idx; i++)
-    {
-        while (DL_UART_isBusy(MSPMotor_INST));
-        DL_UART_Main_transmitData(MSPMotor_INST, frame[i]);
-    }
+    // Â·Â¢Ë
+    Motor_UART3_SendFrame(frame, idx);
 }

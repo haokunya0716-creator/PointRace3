@@ -18,4 +18,5 @@ extern uint8_t task1_flag;
 extern uint8_t task2_flag;
 extern uint8_t task3_flag;
 extern uint8_t task4_flag;
+extern uint8_t stop_flag;
 #endif /* INC_APP_BUTTON_H_ */

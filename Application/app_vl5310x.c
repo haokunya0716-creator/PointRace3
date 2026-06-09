@@ -13,12 +13,12 @@ typedef struct {
 
 /**
  * @brief 三个 XSHUT 引脚和传感器逻辑方向的对应关系。
- * @note PCB/SysConfig 关系为：XSHUT1=左，XSHUT2=前，XSHUT3=右。
+ * @note PCB/SysConfig 关系为：XSHUT1=左，XSHUT2=右，XSHUT3=前。
  */
 static const XshutPin_t xshut_pin[VL5310X_COUNT] = {
-    [VL5310X_FRONT] = {XSHUT_XSHUT2_PORT, XSHUT_XSHUT2_PIN, XSHUT_XSHUT2_IOMUX},
+    [VL5310X_FRONT] = {XSHUT_XSHUT3_PORT, XSHUT_XSHUT3_PIN, XSHUT_XSHUT3_IOMUX},
     [VL5310X_LEFT]  = {XSHUT_XSHUT1_PORT, XSHUT_XSHUT1_PIN, XSHUT_XSHUT1_IOMUX},
-    [VL5310X_RIGHT] = {XSHUT_XSHUT3_PORT, XSHUT_XSHUT3_PIN, XSHUT_XSHUT3_IOMUX},
+    [VL5310X_RIGHT] = {XSHUT_XSHUT2_PORT, XSHUT_XSHUT2_PIN, XSHUT_XSHUT2_IOMUX},
 };
 
 /**
@@ -52,6 +52,8 @@ volatile VL53L0X_Error VL5310X_LastError[VL5310X_COUNT] = {
 volatile uint8_t vl5310x_front_obstacle_flag = 0; // 前方障碍标志
 volatile uint8_t vl5310x_left_obstacle_flag = 0;  // 左侧障碍标志
 volatile uint8_t vl5310x_right_obstacle_flag = 0; // 右侧障碍标志
+
+static uint8_t obstacle_count[VL5310X_COUNT] = {0}; // 三路障碍连续确认次数
 
 /**
  * @brief 控制某一路 XSHUT 电平。
@@ -97,12 +99,31 @@ static uint8_t IsValid(VL5310X_SensorId_t id)
 /**
  * @brief 判断某一路是否检测到障碍。
  * @param id 传感器编号。
- * @param limit_mm 障碍判断阈值，单位 mm。
  * @return 1 表示有障碍，0 表示无障碍或数据无效。
  */
-static uint8_t IsObstacle(VL5310X_SensorId_t id, uint16_t limit_mm)
+static uint8_t IsObstacle(VL5310X_SensorId_t id)
 {
-    return (IsValid(id) && VL5310X_Distance_mm[id] <= limit_mm) ? 1 : 0;
+    return (IsValid(id) &&
+            VL5310X_Distance_mm[id] > VL5310X_OBSTACLE_MIN_MM &&
+            VL5310X_Distance_mm[id] < VL5310X_OBSTACLE_MAX_MM) ? 1 : 0;
+}
+
+/**
+ * @brief 连续确认某一路是否检测到障碍。
+ * @param id 传感器编号。
+ * @return 1 表示连续检测到障碍，0 表示未确认。
+ */
+static uint8_t IsObstacleConfirm(VL5310X_SensorId_t id)
+{
+    if(IsObstacle(id)){
+        if(obstacle_count[id] < 2){
+            obstacle_count[id]++;
+        }
+    }else {
+        obstacle_count[id] = 0;
+    }
+
+    return (obstacle_count[id] >= 2) ? 1 : 0;
 }
 
 /**
@@ -156,9 +177,9 @@ void App_VL5310X_Proc(void)
         }
     }
 
-    vl5310x_front_obstacle_flag = IsObstacle(VL5310X_FRONT, VL5310X_FRONT_OBSTACLE_MM);
-    vl5310x_left_obstacle_flag = IsObstacle(VL5310X_LEFT, VL5310X_SIDE_OBSTACLE_MM);
-    vl5310x_right_obstacle_flag = IsObstacle(VL5310X_RIGHT, VL5310X_SIDE_OBSTACLE_MM);
+    vl5310x_front_obstacle_flag = IsObstacleConfirm(VL5310X_FRONT);
+    vl5310x_left_obstacle_flag = IsObstacleConfirm(VL5310X_LEFT);
+    vl5310x_right_obstacle_flag = IsObstacleConfirm(VL5310X_RIGHT);
 }
 
 /**
