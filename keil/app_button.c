@@ -6,6 +6,7 @@
  */
 
 #include "app_button.h"
+#include "app_task.h"
 #include "button.h"
 
 static Button_TypeDef userKey1; // 用户按钮
@@ -105,8 +106,12 @@ static void OnUserKey_Clicked3(uint8_t clicks)
 
 static void OnStopKey_Clicked4(uint8_t clicks){
 
-	if(clicks == 1){
+	// 任务四使用点击次数作为出口编号输入：
+	// 1 次 -> (3,0)，2 次 -> (3,1)，3 次 -> (3,2)，4 次 -> (3,3)。
+	// 如果后续改成串口/蓝牙输入数字，也只需要调用 Task4_SetExitByNumber(number)。
+	if(clicks >= 1 && clicks <= 4){
 	
+		Task4_SetExitByNumber(clicks);
 		task4_flag = 1;
 	}
 }

@@ -91,6 +91,7 @@ int main(void)
 					stop_flag = 0;
 					task1_flag = 0;
 					task2_flag = 0;
+					task4_flag = 0;
 					App_Speed_Set(0.0f, 0.0f);
 					while(1){
 					}
@@ -114,6 +115,8 @@ int main(void)
              				
 				}else if(task2_flag == 1){
 					  Task2();
+				}else if(task4_flag == 1){
+					  Task4();
 				}else{
 				    PERIODIC_START(task_motor_idle,30)
 					 // App_Set_Speed(0.0f, 0.0f);
@@ -125,7 +128,6 @@ int main(void)
 //					  Task3();					
 //				}
 //					 if(task4_flag == 1){
-//						task4_flag = 0;
 //					  Task4();					
 //				}
 
