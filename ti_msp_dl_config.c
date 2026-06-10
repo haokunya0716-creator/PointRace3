@@ -174,8 +174,11 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
         GPIO_IMU_IOMUX_RX, GPIO_IMU_IOMUX_RX_FUNC);
     DL_GPIO_initPeripheralOutputFunction(
         GPIO_Vision_IOMUX_TX, GPIO_Vision_IOMUX_TX_FUNC);
-    DL_GPIO_initPeripheralInputFunction(
-        GPIO_Vision_IOMUX_RX, GPIO_Vision_IOMUX_RX_FUNC);
+    
+	DL_GPIO_initPeripheralInputFunctionFeatures(
+		 GPIO_Vision_IOMUX_RX, GPIO_Vision_IOMUX_RX_FUNC,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
     DL_GPIO_initPeripheralOutputFunction(
         GPIO_user_IOMUX_TX, GPIO_user_IOMUX_TX_FUNC);
     DL_GPIO_initPeripheralInputFunction(
@@ -256,8 +259,8 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
     DL_GPIO_enableInterrupt(GPIOA, ENCODER_E1A_PIN |
 		ENCODER_E1B_PIN);
     DL_GPIO_clearPins(GPIOB, XSHUT_XSHUT3_PIN |
-		LED_LED_1_PIN |
 		LED_LED_2_PIN);
+    DL_GPIO_setPins(GPIOB, LED_LED_1_PIN);
     DL_GPIO_enableOutput(GPIOB, XSHUT_XSHUT3_PIN |
 		LED_LED_1_PIN |
 		LED_LED_2_PIN);
@@ -633,6 +636,12 @@ SYSCONFIG_WEAK void SYSCFG_DL_Vision_init(void)
     DL_UART_Main_setOversampling(Vision_INST, DL_UART_OVERSAMPLING_RATE_16X);
     DL_UART_Main_setBaudRateDivisor(Vision_INST, Vision_IBRD_40_MHZ_115200_BAUD, Vision_FBRD_40_MHZ_115200_BAUD);
 
+
+    /* Configure Interrupts */
+    DL_UART_Main_enableInterrupt(Vision_INST,
+                                 DL_UART_MAIN_INTERRUPT_RX);
+    /* Setting the Interrupt Priority */
+    NVIC_SetPriority(Vision_INST_INT_IRQN, 0);
 
 
     DL_UART_Main_enable(Vision_INST);

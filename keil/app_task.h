@@ -6,8 +6,9 @@
 
 void Task1(void);
 void Task2(void);
-//void Task3(void);
-void Task4_SetExitByNumber(uint8_t number);
-void Task4(void);
+
+
+extern uint8_t task_exit_x;
+extern uint8_t task_exit_y;
 
 #endif

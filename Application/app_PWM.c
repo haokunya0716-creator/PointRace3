@@ -10,7 +10,7 @@ typedef struct {
 static const PwmCh_t pwm_ch[APP_PWM_NUM] = {
     [APP_PWM_SERVO1] = {SERVO_INST, GPIO_SERVO_C0_IDX, APP_PWM_SERVO_PERIOD_CNT, 2U},
     [APP_PWM_SERVO2] = {SERVO_INST, GPIO_SERVO_C1_IDX, APP_PWM_SERVO_PERIOD_CNT, 2U},
-    [APP_PWM_SERVO3] = {SERVO3_INST, GPIO_SERVO3_C1_IDX, APP_PWM_SERVO_PERIOD_CNT, 1U},
+    [APP_PWM_SERVO3] = {SERVO3_INST, GPIO_SERVO3_C1_IDX, APP_PWM_SERVO_PERIOD_CNT, 2U},
 };
 
 static float pwm_angle[APP_PWM_NUM] = {0};
@@ -38,17 +38,14 @@ static uint32_t AngleToCmp(AppPWM_Id_t id, float deg)
     if (pulse_cnt > pwm_ch[id].period_cnt)
         pulse_cnt = pwm_ch[id].period_cnt;
 
-    return pwm_ch[id].period_cnt - pulse_cnt;
+    return pulse_cnt;
 }
 
 void App_PWM_Init(void)
 {
-    uint8_t i = 0;
-
-    for (i = 0; i < APP_PWM_NUM; i++)
-    {
-        App_PWM_SetAngle((AppPWM_Id_t)i, 90.0f);
-    }
+    App_PWM_SetAngle(APP_PWM_SERVO1, 180.0f);
+    App_PWM_SetAngle(APP_PWM_SERVO2, 110.0f);
+    App_PWM_SetAngle(APP_PWM_SERVO3, 125.0f);
 
     DL_Timer_startCounter(SERVO_INST);
     DL_Timer_startCounter(SERVO3_INST);

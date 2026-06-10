@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>..;..\Application;..\Board;..\Button;..\hardware;..\IMU;..\keil;..\LCD;..\MSP_Motor_Ctrl;..\MSPM0;..\PID;..\source;..\ti;..\VL53L0X;..\source\third_party\CMSIS\Core\Include;..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\App_Task;..\Motor</IncludePath>
+              <IncludePath>..;..\Application;..\Board;..\Button;..\hardware;..\IMU;..\keil;..\LCD;..\MSP_Motor_Ctrl;..\MSPM0;..\PID;..\source;..\ti;..\VL53L0X;..\source\third_party\CMSIS\Core\Include;..\source\third_party\CMSIS\Core\Include;..\..\source;..\MSP_Motor_Ctrl;..\App_Task;..\Motor;..\Vision</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -724,20 +724,30 @@
               <FileType>5</FileType>
               <FilePath>.\app_task.h</FilePath>
             </File>
+            <File>
+              <FileName>app_task4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app_task4.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_task4.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\app_task4.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Motor</GroupName>
           <Files>
             <File>
-              <FileName>motor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\motor.h</FilePath>
-            </File>
-            <File>
               <FileName>motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\motor.h</FilePath>
             </File>
             <File>
               <FileName>app_encoder.h</FileName>
@@ -748,6 +758,21 @@
               <FileName>app_encoder.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\app_encoder.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Vision</GroupName>
+          <Files>
+            <File>
+              <FileName>vision.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Vision\vision.h</FilePath>
+            </File>
+            <File>
+              <FileName>vision.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Vision\vision.c</FilePath>
             </File>
           </Files>
         </Group>

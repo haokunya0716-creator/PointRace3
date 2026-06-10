@@ -111,7 +111,7 @@ static void OnStopKey_Clicked4(uint8_t clicks){
 	// 如果后续改成串口/蓝牙输入数字，也只需要调用 Task4_SetExitByNumber(number)。
 	if(clicks >= 1 && clicks <= 4){
 	
-		Task4_SetExitByNumber(clicks);
+		//Task4_SetExitByNumber(clicks);
 		task4_flag = 1;
 	}
 }

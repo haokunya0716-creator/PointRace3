@@ -3,6 +3,7 @@
 #include "clock.h"
 //#include "vl53l0x.h"
 #include "imu.h"
+#include "vision.h"
 
 uint8_t enable_group1_irq = 0;
 
@@ -19,7 +20,101 @@ void SysTick_Handler(void)
     tick_ms++;
 }
 
-// IMU 串口接收中断服务函数
+// 相机串口中断服务函数 
+void Vision_INST_IRQHandler(void)
+{
+    static uint8_t rx_buf[8];  
+    static uint8_t rx_idx = 0; 
+
+    uint32_t pending_irq = DL_UART_getPendingInterrupt(Vision_INST);
+
+    if (pending_irq == DL_UART_IIDX_RX) 
+    {
+        while (DL_UART_isRXFIFOEmpty(Vision_INST) == false) 
+        {
+            uint8_t temp_data = DL_UART_Main_receiveData(Vision_INST);
+
+            if (rx_idx == 0) {
+                if (temp_data == 0xAA) {
+                    rx_buf[rx_idx++] = temp_data;
+                }
+            } 
+            else if (rx_idx == 1) {
+                if (temp_data == 0x55) {
+                    rx_buf[rx_idx++] = temp_data;
+                } else {
+                    rx_idx = 0;
+                    if (temp_data == 0xAA) {
+                        rx_buf[rx_idx++] = temp_data;
+                    }
+                }
+            } 
+            else {
+                rx_buf[rx_idx++] = temp_data;
+                
+                if (rx_idx >= 5) {
+                    Vision_InvokeCallback(rx_buf, rx_idx);
+                    DL_GPIO_togglePins(LED_LED_2_PORT, LED_LED_2_PIN);
+                    rx_idx = 0; 
+                }
+            }
+        } 
+    }
+    else 
+    {
+        DL_UART_clearInterruptStatus(Vision_INST, 0xFFFFFFFF);
+    }
+}
+
+
+// 相机串口中断服务函数（旧版本）
+//void Vision_INST_IRQHandler(void)
+//{
+
+//    static uint8_t rx_buf[8];  // 接收缓存数组
+//    static uint8_t rx_idx = 0;  // 接收索引
+
+//    switch (DL_UART_getPendingInterrupt(Vision_INST)) {
+//        case DL_UART_IIDX_RX:
+//          
+//            rx_buf[rx_idx] = DL_UART_Main_receiveData(Vision_INST);
+//            // 判断帧头
+//            if (rx_idx == 0 && rx_buf[0] != 0xAA) {
+//                rx_idx = 0; 
+//                break;
+//            }
+//            if (rx_idx == 1 && rx_buf[1] != 0x55) {
+//                rx_idx = 0; 
+//                break;
+//            }
+
+//         
+//            rx_idx++;
+//            // 当接受到5个字节（两个帧头，一个命令位，一个数据位，一个校验和帧尾）开始解析（回调函数里有计算校验和的逻辑）
+//            if (rx_idx >= 5) {
+//                
+//                Vision_InvokeCallback(rx_buf, rx_idx);
+//                DL_GPIO_togglePins(LED_LED_2_PORT, LED_LED_2_PIN);
+//                rx_idx = 0; 
+//            }
+//            break;
+//            
+//        default:
+//            
+//        // AI加的修复
+//             DL_UART_clearInterruptStatus(Vision_INST, 0xFFFFFFFF);
+//            
+//            // 顺便排空可能堆积的错误 FIFO 数据
+//            while (DL_UART_isRXFIFOEmpty(Vision_INST) == false) {
+//                DL_UART_Main_receiveData(Vision_INST); 
+//            }
+//            
+//            // 一旦有干扰，立刻复位接收状态机，防止后续数据全部错位
+//            rx_idx = 0; 
+//            break;
+//    }
+//}
+// IMU陀螺仪 串口接收中断服务函数
 void IMU_INST_IRQHandler(void)
 {
     uint32_t pending_irq = DL_UART_getPendingInterrupt(IMU_INST);
@@ -91,5 +186,3 @@ void TIMER_0_INST_IRQHandler(void)
             break;
     }
 }
-
-
