@@ -32,12 +32,13 @@ int main(void)
 
     SysTick_Init();
     App_Encoder_Init();
-
+    Vision_Init();
     IMU_Init();
     App_VL5310X_Init();
     App_PWM_Init();
     Motor_Init();
     App_Button_Init();
+		
 		
 		delay_ms(100);
 
@@ -172,16 +173,16 @@ int main(void)
 //				}
 
 			
-//        PERIODIC_START(task_display, 200)
+        PERIODIC_START(task_display, 200)
 //							 App_Motor_Data_Update();
 //				 // printf("Yaw:%.2f\n",stcAngle.Yaw);
-//			  printf("%d,%d,%d\n", VL5310X_Distance_mm[0],VL5310X_Distance_mm[1],VL5310X_Distance_mm[2]);
+			  printf("%d,%d,%d\n", VL5310X_Distance_mm[0],VL5310X_Distance_mm[1],VL5310X_Distance_mm[2]);
 				//printf("%.2f,%.2f\n",speed_l,speed_r);
 				//printf("%.2f,%.2f,%.2f,%.2f\n",
       // stcAngle.Yaw,angle_yaw_ref,position_mid,position_mid_ref);
 //				printf("%.2f,%.2f\n",
 //       speed_l_measure,speed_r_measure);
-//        PERIODIC_END
+      PERIODIC_END
 				// 验证小车主循环程序有没有卡死
         PERIODIC_START(manba_out,500)
            DL_GPIO_togglePins(LED_LED_0_PORT,LED_LED_0_PIN);

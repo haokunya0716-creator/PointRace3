@@ -174,11 +174,8 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
         GPIO_IMU_IOMUX_RX, GPIO_IMU_IOMUX_RX_FUNC);
     DL_GPIO_initPeripheralOutputFunction(
         GPIO_Vision_IOMUX_TX, GPIO_Vision_IOMUX_TX_FUNC);
-    
-	DL_GPIO_initPeripheralInputFunctionFeatures(
-		 GPIO_Vision_IOMUX_RX, GPIO_Vision_IOMUX_RX_FUNC,
-		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
-		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+    DL_GPIO_initPeripheralInputFunction(
+        GPIO_Vision_IOMUX_RX, GPIO_Vision_IOMUX_RX_FUNC);
     DL_GPIO_initPeripheralOutputFunction(
         GPIO_user_IOMUX_TX, GPIO_user_IOMUX_TX_FUNC);
     DL_GPIO_initPeripheralInputFunction(

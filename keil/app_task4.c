@@ -1,4 +1,5 @@
 	#include <stdint.h>
+#include "stdio.h"
 
 #include "app_motor.h"
 #include "app_speed.h"
@@ -118,13 +119,22 @@ static void Task4_MarkBlock(uint8_t x, uint8_t y, uint8_t dir)
     }
 }
 
-// 投放完成后，把这一格的四个方向都标记为不可通行，避免小车再次经过被卡住。
+// 投放完成后，把这一格标记为以后不可再进入，避免小车再次经过被卡住。
+// 注意：这里只能封住“邻居格进入本格”的边，绝不能封住“本格出去”的边。
+// 因为投放就发生在本格中心，紧接着的 BFS 仍然要从本格出发找路；
+// 如果把本格四条出边也封了，BFS 从本格出发会找不到任何路，导致小车直接结束停住。
 static void Task4_BlockCell(uint8_t x, uint8_t y)
 {
     uint8_t dir = 0;
+    uint8_t nx = 0;
+    uint8_t ny = 0;
 
     for(dir = 0; dir < 4; dir++){
-        Task4_MarkBlock(x, y, dir);
+        // 只把每个邻居格朝向本格的那条边封死，
+        // 这样以后任何路径都走不进本格，但本格当前还能正常走出去。
+        if(Task4_NextCell(x, y, dir, &nx, &ny)){
+            task4_block[nx][ny][Task4_OppDir(dir)] = 1;
+        }
     }
 }
 
@@ -207,6 +217,13 @@ static void Task4_MarkSensorWall(uint8_t dir, uint8_t only_middle)
 
     // 外圈扫描时只记录朝向中间四格的边，避免把外圈普通边误记成挡板。
     if(only_middle && Task4_IsMiddleCell(nx, ny) == 0){
+        return;
+    }
+
+    // 题目保证挡板只会出现在中间四格相关的边上：这条边至少要有一端是中间格。
+    // 两端都是外圈格的边绝不可能有挡板，一律不标——
+    // 否则激光一旦误判，就可能把外圈通路（尤其出口那一列）堵死，导致到不了出口。
+    if(Task4_IsMiddleCell(task4_x, task4_y) == 0 && Task4_IsMiddleCell(nx, ny) == 0){
         return;
     }
 
@@ -324,6 +341,9 @@ static void Task4_ProcessDrop(void)
         return;
     }
 
+    // 【临时调试】打印实际投放的格子，确认是不是投早了一格、封错了格。
+    printf("[T4] DROP%d at (%d,%d)\r\n", drop_flag, task4_x, task4_y);
+
     if(drop_flag == 1){
         Task4_Drop1();
     }else if(drop_flag == 2){
@@ -332,7 +352,11 @@ static void Task4_ProcessDrop(void)
         Task4_Drop3();
     }
 
-    Task4_BlockCell(task4_x, task4_y);
+    // 投放后把这一格标记为不可经过，避免小车再次经过被卡住。
+    // 但出口格例外：最后必须经过出口格驶出，绝不能把它封成孤岛，否则永远到不了出口。
+    if(!(task4_x == task4_exit_x && task4_y == task4_exit_y)){
+        Task4_BlockCell(task4_x, task4_y);
+    }
     drop_flag = 0;
 }
 
@@ -526,6 +550,45 @@ static void Task4_Finish(void)
 	task4_set_exit_flag = 0;
 }
 
+// 【临时调试】把当前地图里所有“内部墙”（不含四周边墙）打印出来，
+// 用来看清到底是哪条边把通往出口的路堵死了：挡板、投放封格、还是激光误判。
+static void Task4_DumpBlocks(void)
+{
+    const char *name[4] = {"N", "E", "S", "W"};
+    uint8_t x = 0;
+    uint8_t y = 0;
+    uint8_t d = 0;
+
+    for(y = 0; y < 4; y++){
+        for(x = 0; x < 4; x++){
+            for(d = 0; d < 4; d++){
+                if(task4_block[x][y][d] && Task4_IsBoundaryDir(x, y, d) == 0){
+                    printf("[T4] BLK (%d,%d)%s\r\n", x, y, name[d]);
+                }
+            }
+        }
+    }
+}
+
+// 中间四格已经处理完（或剩下的够不着）后，规划并启动“前往出口”的动作。
+// 已经停在出口格就直接转向驶出；否则用 BFS 找一条去出口的路走过去；
+// 只有当确实无路可走时才调用结束函数停车——正常情况下小车只会在驶出出口后才停。
+static void Task4_GotoExit(void)
+{
+    if(task4_x == task4_exit_x && task4_y == task4_exit_y){
+        Task4_StartTurn(TASK4_EXIT_DIR, 30);
+    }else if(Task4_BuildPath(0, task4_exit_x, task4_exit_y)){
+        Task4_StartTurn(task4_path[0], 21);
+    }else {
+        // 【临时调试】到出口已经没有可行路径了——把当前位置和出口打出来。
+        // 多半是“投放封格”把通往出口的路堵死了（常因相机提前识别、投早了一格）。
+        printf("[T4] NO PATH to exit(%d,%d) from (%d,%d) STOP\r\n",
+               task4_exit_x, task4_exit_y, task4_x, task4_y);
+        Task4_DumpBlocks();
+        Task4_Finish();
+    }
+}
+
 void Task4(uint8_t exit)
 {
 	  Drop_Flag_Updata();
@@ -573,32 +636,27 @@ void Task4(uint8_t exit)
             }
         }
     }else if(task4_state == 20){
-        // 中间四格遍历完成后，直接前往出口，不再追加新的挡板信息。
-        // 这样可以避免最后一格的误判数据改变出口路径。
-        if(Task4_MiddleDone()){
-            if(task4_x == task4_exit_x && task4_y == task4_exit_y){
-                Task4_StartTurn(TASK4_EXIT_DIR, 30);
-            }else if(Task4_BuildPath(0, task4_exit_x, task4_exit_y)){
-                Task4_StartTurn(task4_path[0], 21);
-            }else {
-                Task4_Finish();
+        // 只要中间四格还没走完、并且此刻还能找到一条通往未访问中间格的路，就继续遍历中间。
+        // 这里不再用一次性的“放弃中间”锁标志：万一某一刻够不到，
+        // 等走近一点之后还会重新尝试，避免“其实有路却再也不回去补格”的问题。
+        if(Task4_MiddleDone() == 0 && Task4_BuildPath(1, 0, 0)){
+            // 停在格子中心扫前/左/右三面墙，并处理投放。
+            if(Task4_CheckWallDone(0) == 0){
+                return;
             }
-            return;
+
+            Task4_ProcessDrop();
+
+            // 扫墙/投放后地图可能更新，这里重新规划一次，仍然只走一格。
+            if(Task4_BuildPath(1, 0, 0)){
+                Task4_StartTurn(task4_path[0], 21);
+                return;
+            }
         }
 
-        // 中间区域搜索：停在格子中心，使用前/左/右三个传感器。
-        if(Task4_CheckWallDone(0) == 0){
-            return;
-        }
-
-        // 到达格子中心，检测投放标志位。
-        Task4_ProcessDrop();
-
-        if(Task4_BuildPath(1, 0, 0)){
-            Task4_StartTurn(task4_path[0], 21);
-        }else {
-            Task4_Finish();
-        }
+        // 中间四格都走完了，或剩下的暂时够不到 —— 转去指定出口。
+        // 只有真正从出口驶出（state 31）才会结束，半路绝不停车。
+        Task4_GotoExit();
     }else if(task4_state == 2){
         // 公共转向状态。转到目标方向后，再进入下一步。
         App_Angle_Pro();

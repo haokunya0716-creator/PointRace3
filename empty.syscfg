@@ -303,7 +303,6 @@ UART3.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
 UART3.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
 UART3.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
 UART3.rxPinConfig.$name                = "ti_driverlib_gpio_GPIOPinGeneric7";
-UART3.rxPinConfig.enableConfig         = true;
 UART3.rxPinConfig.internalResistor     = "PULL_UP";
 
 UART4.$name                            = "user";
