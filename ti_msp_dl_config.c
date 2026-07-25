@@ -40,10 +40,10 @@
 
 #include "ti_msp_dl_config.h"
 
-DL_TimerG_backupConfig gSERVOBackup;
 DL_TimerA_backupConfig gMOTORBackup;
 DL_TimerA_backupConfig gTIMER_0Backup;
 DL_UART_Main_backupConfig gMSPMotorBackup;
+DL_SPI_backupConfig gNRFBackup;
 
 /*
  *  ======== SYSCFG_DL_init ========
@@ -55,7 +55,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_GPIO_init();
     /* Module-Specific Initializations*/
     SYSCFG_DL_SYSCTL_init();
-    SYSCFG_DL_SERVO_init();
     SYSCFG_DL_MOTOR_init();
     SYSCFG_DL_SERVO3_init();
     SYSCFG_DL_TIMER_0_init();
@@ -64,13 +63,14 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_IMU_init();
     SYSCFG_DL_Vision_init();
     SYSCFG_DL_user_init();
+    SYSCFG_DL_NRF_init();
     SYSCFG_DL_ADC_BAT_init();
     SYSCFG_DL_SYSTICK_init();
     /* Ensure backup structures have no valid state */
-	gSERVOBackup.backupRdy 	= false;
 	gMOTORBackup.backupRdy 	= false;
 	gTIMER_0Backup.backupRdy 	= false;
 	gMSPMotorBackup.backupRdy 	= false;
+	gNRFBackup.backupRdy 	= false;
 
 }
 /*
@@ -81,10 +81,10 @@ SYSCONFIG_WEAK bool SYSCFG_DL_saveConfiguration(void)
 {
     bool retStatus = true;
 
-	retStatus &= DL_TimerG_saveConfiguration(SERVO_INST, &gSERVOBackup);
 	retStatus &= DL_TimerA_saveConfiguration(MOTOR_INST, &gMOTORBackup);
 	retStatus &= DL_TimerA_saveConfiguration(TIMER_0_INST, &gTIMER_0Backup);
 	retStatus &= DL_UART_Main_saveConfiguration(MSPMotor_INST, &gMSPMotorBackup);
+	retStatus &= DL_SPI_saveConfiguration(NRF_INST, &gNRFBackup);
 
     return retStatus;
 }
@@ -94,10 +94,10 @@ SYSCONFIG_WEAK bool SYSCFG_DL_restoreConfiguration(void)
 {
     bool retStatus = true;
 
-	retStatus &= DL_TimerG_restoreConfiguration(SERVO_INST, &gSERVOBackup, false);
 	retStatus &= DL_TimerA_restoreConfiguration(MOTOR_INST, &gMOTORBackup, false);
 	retStatus &= DL_TimerA_restoreConfiguration(TIMER_0_INST, &gTIMER_0Backup, false);
 	retStatus &= DL_UART_Main_restoreConfiguration(MSPMotor_INST, &gMSPMotorBackup);
+	retStatus &= DL_SPI_restoreConfiguration(NRF_INST, &gNRFBackup);
 
     return retStatus;
 }
@@ -106,7 +106,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
 {
     DL_GPIO_reset(GPIOA);
     DL_GPIO_reset(GPIOB);
-    DL_TimerG_reset(SERVO_INST);
     DL_TimerA_reset(MOTOR_INST);
     DL_TimerG_reset(SERVO3_INST);
     DL_TimerA_reset(TIMER_0_INST);
@@ -115,12 +114,12 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_UART_Main_reset(IMU_INST);
     DL_UART_Main_reset(Vision_INST);
     DL_UART_Main_reset(user_INST);
+    DL_SPI_reset(NRF_INST);
     DL_ADC12_reset(ADC_BAT_INST);
 
 
     DL_GPIO_enablePower(GPIOA);
     DL_GPIO_enablePower(GPIOB);
-    DL_TimerG_enablePower(SERVO_INST);
     DL_TimerA_enablePower(MOTOR_INST);
     DL_TimerG_enablePower(SERVO3_INST);
     DL_TimerA_enablePower(TIMER_0_INST);
@@ -129,6 +128,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_UART_Main_enablePower(IMU_INST);
     DL_UART_Main_enablePower(Vision_INST);
     DL_UART_Main_enablePower(user_INST);
+    DL_SPI_enablePower(NRF_INST);
     DL_ADC12_enablePower(ADC_BAT_INST);
 
     delay_cycles(POWER_STARTUP_DELAY);
@@ -137,10 +137,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
 SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 {
 
-    DL_GPIO_initPeripheralOutputFunction(GPIO_SERVO_C0_IOMUX,GPIO_SERVO_C0_IOMUX_FUNC);
-    DL_GPIO_enableOutput(GPIO_SERVO_C0_PORT, GPIO_SERVO_C0_PIN);
-    DL_GPIO_initPeripheralOutputFunction(GPIO_SERVO_C1_IOMUX,GPIO_SERVO_C1_IOMUX_FUNC);
-    DL_GPIO_enableOutput(GPIO_SERVO_C1_PORT, GPIO_SERVO_C1_PIN);
     DL_GPIO_initPeripheralOutputFunction(GPIO_MOTOR_C0_IOMUX,GPIO_MOTOR_C0_IOMUX_FUNC);
     DL_GPIO_enableOutput(GPIO_MOTOR_C0_PORT, GPIO_MOTOR_C0_PIN);
     DL_GPIO_initPeripheralOutputFunction(GPIO_MOTOR_C1_IOMUX,GPIO_MOTOR_C1_IOMUX_FUNC);
@@ -181,19 +177,54 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
     DL_GPIO_initPeripheralInputFunction(
         GPIO_user_IOMUX_RX, GPIO_user_IOMUX_RX_FUNC);
 
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_NRF_IOMUX_SCLK, GPIO_NRF_IOMUX_SCLK_FUNC);
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_NRF_IOMUX_PICO, GPIO_NRF_IOMUX_PICO_FUNC);
+    DL_GPIO_initPeripheralInputFunction(
+        GPIO_NRF_IOMUX_POCI, GPIO_NRF_IOMUX_POCI_FUNC);
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_NRF_IOMUX_CS0, GPIO_NRF_IOMUX_CS0_FUNC);
+
+    DL_GPIO_initDigitalOutput(LED_PIN_0_IOMUX);
+
     DL_GPIO_initDigitalOutput(XSHUT_XSHUT1_IOMUX);
 
     DL_GPIO_initDigitalOutput(XSHUT_XSHUT2_IOMUX);
 
     DL_GPIO_initDigitalOutput(XSHUT_XSHUT3_IOMUX);
 
-    DL_GPIO_initDigitalOutput(LINE_FOLLOW_AD0_X1_IOMUX);
+    DL_GPIO_initDigitalOutput(XSHUT_XSHUT0_IOMUX);
 
-    DL_GPIO_initDigitalOutput(LINE_FOLLOW_AD1_X2_IOMUX);
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN1_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
-    DL_GPIO_initDigitalOutput(LINE_FOLLOW_AD2_X3_IOMUX);
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN2_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
-    DL_GPIO_initDigitalInputFeatures(LINE_FOLLOW_OUT_X4_IOMUX,
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN3_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN4_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN5_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN6_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN7_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(LINE_PIN8_IOMUX,
 		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
 		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
@@ -213,12 +244,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
 		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
-    DL_GPIO_initDigitalOutput(LED_LED_0_IOMUX);
-
-    DL_GPIO_initDigitalOutput(LED_LED_1_IOMUX);
-
-    DL_GPIO_initDigitalOutput(LED_LED_2_IOMUX);
-
     DL_GPIO_initDigitalInputFeatures(ENCODER_E1A_IOMUX,
 		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
 		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
@@ -236,39 +261,31 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
     DL_GPIO_clearPins(GPIOA, XSHUT_XSHUT1_PIN |
-		XSHUT_XSHUT2_PIN |
-		LINE_FOLLOW_AD0_X1_PIN |
-		LINE_FOLLOW_AD1_X2_PIN |
-		LINE_FOLLOW_AD2_X3_PIN |
-		LED_LED_0_PIN);
+		XSHUT_XSHUT3_PIN);
     DL_GPIO_enableOutput(GPIOA, XSHUT_XSHUT1_PIN |
-		XSHUT_XSHUT2_PIN |
-		LINE_FOLLOW_AD0_X1_PIN |
-		LINE_FOLLOW_AD1_X2_PIN |
-		LINE_FOLLOW_AD2_X3_PIN |
-		LED_LED_0_PIN);
-    DL_GPIO_setLowerPinsPolarity(GPIOA, DL_GPIO_PIN_12_EDGE_RISE_FALL |
-		DL_GPIO_PIN_13_EDGE_RISE);
-    DL_GPIO_setLowerPinsInputFilter(GPIOA, DL_GPIO_PIN_12_INPUT_FILTER_3_CYCLES |
-		DL_GPIO_PIN_13_INPUT_FILTER_3_CYCLES);
+		XSHUT_XSHUT3_PIN);
+    DL_GPIO_setLowerPinsPolarity(GPIOA, DL_GPIO_PIN_13_EDGE_RISE);
+    DL_GPIO_setUpperPinsPolarity(GPIOA, DL_GPIO_PIN_29_EDGE_RISE_FALL |
+		DL_GPIO_PIN_31_EDGE_RISE_FALL |
+		DL_GPIO_PIN_28_EDGE_RISE);
+    DL_GPIO_setLowerPinsInputFilter(GPIOA, DL_GPIO_PIN_13_INPUT_FILTER_3_CYCLES);
+    DL_GPIO_setUpperPinsInputFilter(GPIOA, DL_GPIO_PIN_29_INPUT_FILTER_3_CYCLES |
+		DL_GPIO_PIN_31_INPUT_FILTER_8_CYCLES |
+		DL_GPIO_PIN_28_INPUT_FILTER_8_CYCLES);
     DL_GPIO_clearInterruptStatus(GPIOA, ENCODER_E1A_PIN |
-		ENCODER_E1B_PIN);
+		ENCODER_E1B_PIN |
+		ENCODER_E2A_PIN |
+		ENCODER_E2B_PIN);
     DL_GPIO_enableInterrupt(GPIOA, ENCODER_E1A_PIN |
-		ENCODER_E1B_PIN);
-    DL_GPIO_clearPins(GPIOB, XSHUT_XSHUT3_PIN |
-		LED_LED_2_PIN);
-    DL_GPIO_setPins(GPIOB, LED_LED_1_PIN);
-    DL_GPIO_enableOutput(GPIOB, XSHUT_XSHUT3_PIN |
-		LED_LED_1_PIN |
-		LED_LED_2_PIN);
-    DL_GPIO_setUpperPinsPolarity(GPIOB, DL_GPIO_PIN_23_EDGE_RISE_FALL |
-		DL_GPIO_PIN_27_EDGE_RISE);
-    DL_GPIO_setUpperPinsInputFilter(GPIOB, DL_GPIO_PIN_23_INPUT_FILTER_8_CYCLES |
-		DL_GPIO_PIN_27_INPUT_FILTER_8_CYCLES);
-    DL_GPIO_clearInterruptStatus(GPIOB, ENCODER_E2A_PIN |
+		ENCODER_E1B_PIN |
+		ENCODER_E2A_PIN |
 		ENCODER_E2B_PIN);
-    DL_GPIO_enableInterrupt(GPIOB, ENCODER_E2A_PIN |
-		ENCODER_E2B_PIN);
+    DL_GPIO_clearPins(GPIOB, LED_PIN_0_PIN |
+		XSHUT_XSHUT2_PIN |
+		XSHUT_XSHUT0_PIN);
+    DL_GPIO_enableOutput(GPIOB, LED_PIN_0_PIN |
+		XSHUT_XSHUT2_PIN |
+		XSHUT_XSHUT0_PIN);
 
 }
 
@@ -306,54 +323,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_SYSCTL_init(void)
 }
 
 
-/*
- * Timer clock configuration to be sourced by  / 1 (80000000 Hz)
- * timerClkFreq = (timerClkSrc / (timerClkDivRatio * (timerClkPrescale + 1)))
- *   500000 Hz = 80000000 Hz / (1 * (159 + 1))
- */
-static const DL_TimerG_ClockConfig gSERVOClockConfig = {
-    .clockSel = DL_TIMER_CLOCK_BUSCLK,
-    .divideRatio = DL_TIMER_CLOCK_DIVIDE_1,
-    .prescale = 159U
-};
-
-static const DL_TimerG_PWMConfig gSERVOConfig = {
-    .pwmMode = DL_TIMER_PWM_MODE_EDGE_ALIGN_UP,
-    .period = 10000,
-    .isTimerWithFourCC = false,
-    .startTimer = DL_TIMER_STOP,
-};
-
-SYSCONFIG_WEAK void SYSCFG_DL_SERVO_init(void) {
-
-    DL_TimerG_setClockConfig(
-        SERVO_INST, (DL_TimerG_ClockConfig *) &gSERVOClockConfig);
-
-    DL_TimerG_initPWMMode(
-        SERVO_INST, (DL_TimerG_PWMConfig *) &gSERVOConfig);
-
-    DL_TimerG_setCaptureCompareOutCtl(SERVO_INST, DL_TIMER_CC_OCTL_INIT_VAL_LOW,
-		DL_TIMER_CC_OCTL_INV_OUT_DISABLED, DL_TIMER_CC_OCTL_SRC_FUNCVAL,
-		DL_TIMERG_CAPTURE_COMPARE_0_INDEX);
-
-    DL_TimerG_setCaptCompUpdateMethod(SERVO_INST, DL_TIMER_CC_UPDATE_METHOD_IMMEDIATE, DL_TIMERG_CAPTURE_COMPARE_0_INDEX);
-    DL_TimerG_setCaptureCompareValue(SERVO_INST, 0, DL_TIMER_CC_0_INDEX);
-
-    DL_TimerG_setCaptureCompareOutCtl(SERVO_INST, DL_TIMER_CC_OCTL_INIT_VAL_LOW,
-		DL_TIMER_CC_OCTL_INV_OUT_DISABLED, DL_TIMER_CC_OCTL_SRC_FUNCVAL,
-		DL_TIMERG_CAPTURE_COMPARE_1_INDEX);
-
-    DL_TimerG_setCaptCompUpdateMethod(SERVO_INST, DL_TIMER_CC_UPDATE_METHOD_IMMEDIATE, DL_TIMERG_CAPTURE_COMPARE_1_INDEX);
-    DL_TimerG_setCaptureCompareValue(SERVO_INST, 0, DL_TIMER_CC_1_INDEX);
-
-    DL_TimerG_enableClock(SERVO_INST);
-
-
-    
-    DL_TimerG_setCCPDirection(SERVO_INST , DL_TIMER_CC0_OUTPUT | DL_TIMER_CC1_OUTPUT );
-
-
-}
 /*
  * Timer clock configuration to be sourced by  / 1 (80000000 Hz)
  * timerClkFreq = (timerClkSrc / (timerClkDivRatio * (timerClkPrescale + 1)))
@@ -674,6 +643,39 @@ SYSCONFIG_WEAK void SYSCFG_DL_user_init(void)
 
 
     DL_UART_Main_enable(user_INST);
+}
+
+static const DL_SPI_Config gNRF_config = {
+    .mode        = DL_SPI_MODE_CONTROLLER,
+    .frameFormat = DL_SPI_FRAME_FORMAT_MOTO4_POL0_PHA0,
+    .parity      = DL_SPI_PARITY_NONE,
+    .dataSize    = DL_SPI_DATA_SIZE_8,
+    .bitOrder    = DL_SPI_BIT_ORDER_MSB_FIRST,
+    .chipSelectPin = DL_SPI_CHIP_SELECT_0,
+};
+
+static const DL_SPI_ClockConfig gNRF_clockConfig = {
+    .clockSel    = DL_SPI_CLOCK_BUSCLK,
+    .divideRatio = DL_SPI_CLOCK_DIVIDE_RATIO_1
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_NRF_init(void) {
+    DL_SPI_setClockConfig(NRF_INST, (DL_SPI_ClockConfig *) &gNRF_clockConfig);
+
+    DL_SPI_init(NRF_INST, (DL_SPI_Config *) &gNRF_config);
+
+    /* Configure Controller mode */
+    /*
+     * Set the bit rate clock divider to generate the serial output clock
+     *     outputBitRate = (spiInputClock) / ((1 + SCR) * 2)
+     *     8000000 = (80000000)/((1 + 4) * 2)
+     */
+    DL_SPI_setBitRateSerialClockDivider(NRF_INST, 4);
+    /* Set RX and TX FIFO threshold levels */
+    DL_SPI_setFIFOThreshold(NRF_INST, DL_SPI_RX_FIFO_LEVEL_1_2_FULL, DL_SPI_TX_FIFO_LEVEL_1_2_EMPTY);
+
+    /* Enable module */
+    DL_SPI_enable(NRF_INST);
 }
 
 /* ADC_BAT Initialization */

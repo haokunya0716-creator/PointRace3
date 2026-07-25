@@ -3,13 +3,13 @@
 #define MOTOR_PWM_PERIOD_COUNT 8000U
 
 /* MOTOR: TIMA0
- * Left motor:  AIN2 -> PB8  -> C0, AIN1 -> PB9  -> C1
- * Right motor: BIN2 -> PB12 -> C2, BIN1 -> PB13 -> C3
+ * Left motor:  AIN2 -> PA8  -> C0, AIN1 -> PA9  -> C1
+ * Right motor: BIN2 -> PB13 -> C3, BIN1 -> PB12 -> C2
  */
 #define MOTOR_AIN2_CC GPIO_MOTOR_C0_IDX
 #define MOTOR_AIN1_CC GPIO_MOTOR_C1_IDX
-#define MOTOR_BIN2_CC GPIO_MOTOR_C2_IDX
-#define MOTOR_BIN1_CC GPIO_MOTOR_C3_IDX
+#define MOTOR_BIN2_CC GPIO_MOTOR_C3_IDX
+#define MOTOR_BIN1_CC GPIO_MOTOR_C2_IDX
 
 static uint8_t motor_enabled = 0;
 

@@ -374,7 +374,7 @@
             <ScatterFile>./mspm0g3507.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc>"D:\TI\M0_SDK\mspm0_sdk_2_02_00_05\PointRace3\source\ti\driverlib\lib\keil\m0p\mspm0g1x0x_g3x0x\driverlib.a"</Misc>
+            <Misc>"D:\TI\M0_SDK\mspm0_sdk_2_02_00_05\2026_Final\source\ti\driverlib\lib\keil\m0p\mspm0g1x0x_g3x0x\driverlib.a"</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>
@@ -708,31 +708,6 @@
               <FileName>button.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Button\button.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>App_Task</GroupName>
-          <Files>
-            <File>
-              <FileName>app_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\app_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\app_task.h</FilePath>
-            </File>
-            <File>
-              <FileName>app_task4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\app_task4.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_task4.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\app_task4.h</FilePath>
             </File>
           </Files>
         </Group>

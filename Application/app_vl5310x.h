@@ -49,4 +49,12 @@ void App_VL5310X_Proc(void);
  */
 uint16_t App_VL5310X_GetDistance(VL5310X_SensorId_t id);
 
+/**
+ * @brief 判断某一路最新读数是否有效（在线、已就绪、无错误、且 RangeStatus 正常）。
+ * @param id 传感器编号。
+ * @return 1 表示读数有效，0 表示无效（包含超量程、丢包等）。
+ * @note 量程只有约 80cm，超量程时返回 0，调用方应把它当作“没有障碍”。
+ */
+uint8_t App_VL5310X_IsValid(VL5310X_SensorId_t id);
+
 #endif /* APP_VL5310X_H_ */

@@ -21,13 +21,12 @@ static volatile uint64_t t1_r = 0;
 
 void App_Encoder_Init(void)
 {
-    DL_GPIO_clearInterruptStatus(GPIOA, ENCODER_E1A_PIN | ENCODER_E1B_PIN);
-    DL_GPIO_clearInterruptStatus(GPIOB, ENCODER_E2A_PIN | ENCODER_E2B_PIN);
+    DL_GPIO_clearInterruptStatus(ENCODER_PORT,
+        ENCODER_E1A_PIN | ENCODER_E1B_PIN |
+        ENCODER_E2A_PIN | ENCODER_E2B_PIN);
 
-    NVIC_ClearPendingIRQ(ENCODER_GPIOA_INT_IRQN);
-    NVIC_ClearPendingIRQ(ENCODER_GPIOB_INT_IRQN);
-    NVIC_EnableIRQ(ENCODER_GPIOA_INT_IRQN);
-    NVIC_EnableIRQ(ENCODER_GPIOB_INT_IRQN);
+    NVIC_ClearPendingIRQ(ENCODER_INT_IRQN);
+    NVIC_EnableIRQ(ENCODER_INT_IRQN);
 }
 
 static uint64_t App_Encoder_GetUs(void)
@@ -111,17 +110,16 @@ float App_Encoder_GetSpeed_R(void)
 
 void GROUP1_IRQHandler(void)
 {
-    uint32_t gpioa_status = DL_GPIO_getEnabledInterruptStatus(
-        GPIOA, ENCODER_E1A_PIN | ENCODER_E1B_PIN);
-    uint32_t gpiob_status = DL_GPIO_getEnabledInterruptStatus(
-        GPIOB, ENCODER_E2A_PIN | ENCODER_E2B_PIN);
+    uint32_t encoder_status = DL_GPIO_getEnabledInterruptStatus(
+        ENCODER_PORT, ENCODER_E1A_PIN | ENCODER_E1B_PIN |
+        ENCODER_E2A_PIN | ENCODER_E2B_PIN);
 
-    if ((gpioa_status & ENCODER_E1A_PIN) != 0U) {
+    if ((encoder_status & ENCODER_E1A_PIN) != 0U) {
         t1_l = t0_l;
         t0_l = App_Encoder_GetUs();
 
-        uint8_t a_L = (DL_GPIO_readPins(ENCODER_E1A_PORT, ENCODER_E1A_PIN) != 0U) ? 1U : 0U;
-        uint8_t b_L = (DL_GPIO_readPins(ENCODER_E1B_PORT, ENCODER_E1B_PIN) != 0U) ? 1U : 0U;
+        uint8_t a_L = (DL_GPIO_readPins(ENCODER_PORT, ENCODER_E1A_PIN) != 0U) ? 1U : 0U;
+        uint8_t b_L = (DL_GPIO_readPins(ENCODER_PORT, ENCODER_E1B_PIN) != 0U) ? 1U : 0U;
 
         if ((a_L == 1U && b_L == 0U) || (a_L == 0U && b_L == 1U)) {
             encoder_L++;
@@ -142,12 +140,12 @@ void GROUP1_IRQHandler(void)
         }
     }
 
-    if ((gpiob_status & ENCODER_E2A_PIN) != 0U) {
+    if ((encoder_status & ENCODER_E2A_PIN) != 0U) {
         t1_r = t0_r;
         t0_r = App_Encoder_GetUs();
 
-        uint8_t a_R = (DL_GPIO_readPins(ENCODER_E2A_PORT, ENCODER_E2A_PIN) != 0U) ? 1U : 0U;
-        uint8_t b_R = (DL_GPIO_readPins(ENCODER_E2B_PORT, ENCODER_E2B_PIN) != 0U) ? 1U : 0U;
+        uint8_t a_R = (DL_GPIO_readPins(ENCODER_PORT, ENCODER_E2A_PIN) != 0U) ? 1U : 0U;
+        uint8_t b_R = (DL_GPIO_readPins(ENCODER_PORT, ENCODER_E2B_PIN) != 0U) ? 1U : 0U;
 
         if ((a_R == 1U && b_R == 0U) || (a_R == 0U && b_R == 1U)) {
             encoder_R--;
@@ -168,8 +166,7 @@ void GROUP1_IRQHandler(void)
         }
     }
 
-    DL_GPIO_clearInterruptStatus(GPIOA, gpioa_status);
-    DL_GPIO_clearInterruptStatus(GPIOB, gpiob_status);
+    DL_GPIO_clearInterruptStatus(ENCODER_PORT, encoder_status);
 }
 
 int App_Encoder_GetEncoder_L(void){

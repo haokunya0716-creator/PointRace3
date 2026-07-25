@@ -13,6 +13,13 @@
 #define TASK4_EXIT_DIR 1
 #define TASK4_TURN_WAIT_MS 150
 
+// 挡板判定距离：车停在格子中心时，本格边上的挡板约 22.5cm，隔壁格约 67.5cm。
+// 阈值贴着实测的挡板距离收紧，把略远的斜打误判挡在门外：
+// 左右实测≤25cm → 用 25cm；前方实测≤20cm → 用 20cm；下限滤掉过近的乱码。
+#define TASK4_WALL_FRONT_MM 200
+#define TASK4_WALL_SIDE_MM  250
+#define TASK4_WALL_MIN_MM   30
+
 
 extern uint8_t task3_set_exit_flag;
 extern uint8_t task4_set_exit_flag;
@@ -41,6 +48,7 @@ static uint8_t task4_front_count = 0;
 static uint8_t task4_left_count = 0;
 static uint8_t task4_right_count = 0;
 static uint8_t task4_outer_step = 0;
+static uint8_t task4_ignore_block = 0;
 static unsigned long task4_check_time = 0;
 static unsigned long task4_turn_wait_time = 0;
 static float task4_yaw_base = 0.0f;
@@ -143,6 +151,13 @@ static uint8_t Task4_CanGo(uint8_t x, uint8_t y, uint8_t dir)
     uint8_t nx = 0;
     uint8_t ny = 0;
 
+    // 兜底找路模式：忽略所有动态检测/投放产生的挡板。
+    // 网格边界仍由 NextCell（越界返回 0）挡住，所以不会规划到场地外。
+    // 用于“到出口被围死”时强行挤出一条路，保证小车一定能驶出出口。
+    if(task4_ignore_block){
+        return Task4_NextCell(x, y, dir, &nx, &ny);
+    }
+
     if(task4_block[x][y][dir]){
         return 0;
     }
@@ -191,11 +206,22 @@ static uint8_t Task4_IsBoundaryDir(uint8_t x, uint8_t y, uint8_t dir)
     return 0;
 }
 
-static uint8_t Task4_IsObstacle(VL5310X_SensorId_t id)
+static uint8_t Task4_IsObstacle(VL5310X_SensorId_t id, uint16_t max_mm)
 {
-    uint16_t distance = App_VL5310X_GetDistance(id);
+    uint16_t distance = 0;
 
-    if(distance > VL5310X_OBSTACLE_MIN_MM && distance < VL5310X_OBSTACLE_MAX_MM){
+    // 读数无效（不在线/未就绪/超量程等）一律当作“没有挡板”。
+    // 激光量程只有约 80cm，没墙时经常超量程，必须先靠有效性挡掉垃圾值，
+    // 否则超量程回的乱码距离可能正好落进阈值里，凭空标出一道墙。
+    if(App_VL5310X_IsValid(id) == 0){
+        return 0;
+    }
+
+    distance = App_VL5310X_GetDistance(id);
+
+    // 只认“本格这条边”上的挡板：距离落在 [下限, max_mm) 内才算。
+    // 距离更大的是隔壁格的墙（约 67.5cm），不属于本格，不标。
+    if(distance > TASK4_WALL_MIN_MM && distance < max_mm){
         return 1;
     }
 
@@ -247,15 +273,15 @@ static uint8_t Task4_CheckWallDone(uint8_t only_left)
         App_VL5310X_Proc();
 
         // 每次停在格子中心时采 3 次，3 次都在障碍距离范围内才算挡板。
-        if(only_left == 0 && Task4_IsObstacle(VL5310X_FRONT)){
+        if(only_left == 0 && Task4_IsObstacle(VL5310X_FRONT, TASK4_WALL_FRONT_MM)){
             task4_front_count++;
         }
 
-        if(Task4_IsObstacle(VL5310X_LEFT)){
+        if(Task4_IsObstacle(VL5310X_LEFT, TASK4_WALL_SIDE_MM)){
             task4_left_count++;
         }
 
-        if(only_left == 0 && Task4_IsObstacle(VL5310X_RIGHT)){
+        if(only_left == 0 && Task4_IsObstacle(VL5310X_RIGHT, TASK4_WALL_SIDE_MM)){
             task4_right_count++;
         }
 
@@ -575,18 +601,36 @@ static void Task4_DumpBlocks(void)
 // 只有当确实无路可走时才调用结束函数停车——正常情况下小车只会在驶出出口后才停。
 static void Task4_GotoExit(void)
 {
+    uint8_t ok = 0;
+
     if(task4_x == task4_exit_x && task4_y == task4_exit_y){
         Task4_StartTurn(TASK4_EXIT_DIR, 30);
-    }else if(Task4_BuildPath(0, task4_exit_x, task4_exit_y)){
-        Task4_StartTurn(task4_path[0], 21);
-    }else {
-        // 【临时调试】到出口已经没有可行路径了——把当前位置和出口打出来。
-        // 多半是“投放封格”把通往出口的路堵死了（常因相机提前识别、投早了一格）。
-        printf("[T4] NO PATH to exit(%d,%d) from (%d,%d) STOP\r\n",
-               task4_exit_x, task4_exit_y, task4_x, task4_y);
-        Task4_DumpBlocks();
-        Task4_Finish();
+        return;
     }
+
+    if(Task4_BuildPath(0, task4_exit_x, task4_exit_y)){
+        Task4_StartTurn(task4_path[0], 21);
+        return;
+    }
+
+    // 正常地图里到出口没有路（多半是误标/投放把出口围住了）。
+    // 兜底：忽略所有动态挡板、只认场地边界，强行规划一条去出口的路，
+    // 保证小车无论如何都走得到出口、从出口驶出（题目要求必须从出口出去）。
+    printf("[T4] exit unreachable, retry ignoring dynamic walls\r\n");
+    task4_ignore_block = 1;
+    ok = Task4_BuildPath(0, task4_exit_x, task4_exit_y);
+    task4_ignore_block = 0;
+
+    if(ok){
+        Task4_StartTurn(task4_path[0], 21);
+        return;
+    }
+
+    // 连忽略动态墙都到不了出口（理论上不可能发生），才真正停车。
+    printf("[T4] NO PATH to exit(%d,%d) from (%d,%d) STOP\r\n",
+           task4_exit_x, task4_exit_y, task4_x, task4_y);
+    Task4_DumpBlocks();
+    Task4_Finish();
 }
 
 void Task4(uint8_t exit)

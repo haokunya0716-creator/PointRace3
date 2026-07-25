@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "stdio.h"
 
 #include "app_motor.h"
 #include "app_speed.h"
@@ -10,6 +11,13 @@ uint8_t task_exit_x =  3;
 uint8_t task_exit_y =  1;
 #define TASK2_EXIT_DIR 1
 #define TASK2_TURN_WAIT_MS 150
+
+// 挡板判定距离：车停在格子中心时，本格边上的挡板约 22.5cm，隔壁格约 67.5cm。
+// 阈值贴着实测的挡板距离收紧，把略远的斜打误判挡在门外：
+// 左右实测≤25cm → 用 25cm；前方实测≤20cm → 用 20cm；下限滤掉过近的乱码。
+#define TASK2_WALL_FRONT_MM 200
+#define TASK2_WALL_SIDE_MM  250
+#define TASK2_WALL_MIN_MM   30
 
 extern uint8_t task1_flag;
 extern uint8_t task2_flag;
@@ -157,11 +165,22 @@ static uint8_t Task2_IsBoundaryDir(uint8_t x, uint8_t y, uint8_t dir)
     return 0;
 }
 
-static uint8_t Task2_IsObstacle(VL5310X_SensorId_t id)
+static uint8_t Task2_IsObstacle(VL5310X_SensorId_t id, uint16_t max_mm)
 {
-    uint16_t distance = App_VL5310X_GetDistance(id);
+    uint16_t distance = 0;
 
-    if(distance > VL5310X_OBSTACLE_MIN_MM && distance < VL5310X_OBSTACLE_MAX_MM){
+    // 读数无效（不在线/未就绪/超量程等）一律当作“没有挡板”。
+    // 激光量程只有约 80cm，没墙时经常超量程，必须先靠有效性挡掉垃圾值，
+    // 否则超量程回的乱码距离可能正好落进阈值里，凭空标出一道墙。
+    if(App_VL5310X_IsValid(id) == 0){
+        return 0;
+    }
+
+    distance = App_VL5310X_GetDistance(id);
+
+    // 只认“本格这条边”上的挡板：距离落在 [下限, max_mm) 内才算。
+    // 距离更大的是隔壁格的墙（约 67.5cm），不属于本格，不标。
+    if(distance > TASK2_WALL_MIN_MM && distance < max_mm){
         return 1;
     }
 
@@ -186,6 +205,20 @@ static void Task2_MarkSensorWall(uint8_t dir, uint8_t only_middle)
         return;
     }
 
+    // 题目保证挡板只会出现在中间四格相关的边上：这条边至少要有一端是中间格。
+    // 两端都是外圈格的边绝不可能有挡板，一律不标——
+    // 否则激光一旦误判，就可能把外圈通路堵死，导致遍历或驶出受阻。
+    if(Task2_IsMiddleCell(task2_x, task2_y) == 0 && Task2_IsMiddleCell(nx, ny) == 0){
+        return;
+    }
+
+    // 整个过程中，每首次检测到一块挡板就实时打印它的位置；
+    // 同一条边会从两侧各标一次，这里只在第一次（block 还是 0）时打印，自动去重。
+    if(task2_block[task2_x][task2_y][dir] == 0){
+        static const char *wall_name[4] = {"N", "E", "S", "W"};
+        printf("[T2] WALL (%d,%d)%s\r\n", task2_x, task2_y, wall_name[dir]);
+    }
+
     Task2_MarkBlock(task2_x, task2_y, dir);
 }
 
@@ -206,15 +239,15 @@ static uint8_t Task2_CheckWallDone(uint8_t only_left)
         App_VL5310X_Proc();
 
         // 每次停在格子中心时采 3 次，3 次都在障碍距离范围内才算挡板。
-        if(only_left == 0 && Task2_IsObstacle(VL5310X_FRONT)){
+        if(only_left == 0 && Task2_IsObstacle(VL5310X_FRONT, TASK2_WALL_FRONT_MM)){
             task2_front_count++;
         }
 
-        if(Task2_IsObstacle(VL5310X_LEFT)){
+        if(Task2_IsObstacle(VL5310X_LEFT, TASK2_WALL_SIDE_MM)){
             task2_left_count++;
         }
 
-        if(only_left == 0 && Task2_IsObstacle(VL5310X_RIGHT)){
+        if(only_left == 0 && Task2_IsObstacle(VL5310X_RIGHT, TASK2_WALL_SIDE_MM)){
             task2_right_count++;
         }
 
@@ -421,11 +454,33 @@ static void Task2_UpdatePos(void)
     }
 }
 
+// 把整个过程检测到的所有挡板（内部墙，不含四周边墙）汇总打印一遍。
+static void Task2_DumpBlocks(void)
+{
+    const char *name[4] = {"N", "E", "S", "W"};
+    uint8_t x = 0;
+    uint8_t y = 0;
+    uint8_t d = 0;
+
+    for(y = 0; y < 4; y++){
+        for(x = 0; x < 4; x++){
+            for(d = 0; d < 4; d++){
+                if(task2_block[x][y][d] && Task2_IsBoundaryDir(x, y, d) == 0){
+                    printf("[T2] BLK (%d,%d)%s\r\n", x, y, name[d]);
+                }
+            }
+        }
+    }
+}
+
 static void Task2_Finish(void)
 {
     App_Speed_Set(0.0f, 0.0f);
     task2_state = 0;
     task2_flag = 0;
+
+    // 任务结束时，把整个过程检测到的挡板汇总打印出来，方便核对。
+    Task2_DumpBlocks();
 }
 
 void Task1(void)

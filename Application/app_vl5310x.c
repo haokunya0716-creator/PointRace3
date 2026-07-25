@@ -194,3 +194,16 @@ uint16_t App_VL5310X_GetDistance(VL5310X_SensorId_t id)
 
     return VL5310X_Distance_mm[id];
 }
+
+/**
+ * @brief 判断某一路最新读数是否有效。
+ * @param id 传感器编号。
+ * @return 1 表示有效，0 表示无效（含超量程）。
+ */
+uint8_t App_VL5310X_IsValid(VL5310X_SensorId_t id)
+{
+    if (id >= VL5310X_COUNT)
+        return 0;
+
+    return IsValid(id);
+}

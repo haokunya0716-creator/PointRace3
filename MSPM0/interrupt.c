@@ -94,7 +94,6 @@ void Vision_INST_IRQHandler(void)
             if (rx_idx >= 5) {
                 
                 Vision_InvokeCallback(rx_buf, rx_idx);
-                DL_GPIO_togglePins(LED_LED_2_PORT, LED_LED_2_PIN);
                 rx_idx = 0; 
             }
             break;
@@ -123,14 +122,15 @@ void IMU_INST_IRQHandler(void)
     {
         case DL_UART_IIDX_RX: // 正常接收中断
             // 读取 IMU 串口数据并送入姿态解析器
-            CopeSerial2Data(DL_UART_Main_receiveData(IMU_INST));
+            //CopeSeriaIMU6Data(DL_UART_Main_receiveData(IMU_INST));
+        // 如果是使用单轴陀螺仪，就把上面的代码注释掉，使用下面的解析代码 
+            CopeSeriaIMU1Data(DL_UART_Main_receiveData(IMU_INST));
             break;
 
-        // 【修改点5：核心救命代码】加入硬件错误处理，防止死锁
         case DL_UART_IIDX_OVERRUN_ERROR:    // 溢出错误 (delay_ms导致的真凶)
         case DL_UART_IIDX_FRAMING_ERROR:    // 帧错误
         case DL_UART_IIDX_PARITY_ERROR:     // 校验错误
-            // 1. 清除所有的错误中断标志位，这步不写，串口永久假死
+
             DL_UART_clearInterruptStatus(IMU_INST, 
                 DL_UART_INTERRUPT_OVERRUN_ERROR | 
                 DL_UART_INTERRUPT_FRAMING_ERROR | 

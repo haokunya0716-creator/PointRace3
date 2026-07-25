@@ -33,8 +33,8 @@ void App_Button_Init(void)
 {
     Button_InitTypeDef Button_InitStruct1 = {0};
 
-    Button_InitStruct1.GPIOx = GPIOA;
-    Button_InitStruct1.GPIO_Pin = DL_GPIO_PIN_28;
+    Button_InitStruct1.GPIOx = GPIOB;
+    Button_InitStruct1.GPIO_Pin = DL_GPIO_PIN_23;
 
     My_Button_Init(&userKey1, &Button_InitStruct1);
 
@@ -43,7 +43,7 @@ void App_Button_Init(void)
     Button_InitTypeDef Button_InitStruct2 = {0};
 
     Button_InitStruct2.GPIOx = GPIOA;
-    Button_InitStruct2.GPIO_Pin = DL_GPIO_PIN_8;
+    Button_InitStruct2.GPIO_Pin = DL_GPIO_PIN_7;
 
     My_Button_Init(&userKey2, &Button_InitStruct2);
 
@@ -51,8 +51,8 @@ void App_Button_Init(void)
     //////////////////////////////////////////////////
     Button_InitTypeDef Button_InitStruct3 = {0};
 
-    Button_InitStruct3.GPIOx = GPIOA;
-    Button_InitStruct3.GPIO_Pin = DL_GPIO_PIN_9;
+    Button_InitStruct3.GPIOx = GPIOB;
+    Button_InitStruct3.GPIO_Pin = DL_GPIO_PIN_27;
 
     My_Button_Init(&userKey3, &Button_InitStruct3);
 
